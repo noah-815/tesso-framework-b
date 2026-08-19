@@ -79,6 +79,18 @@ badge(left/top 12px · padding 8/10px), pagination 버튼 32px · 글리프 24px
 
 390px 기준 문서 높이 2158px (Figma 프레임 2177px — hairline 반올림 차).
 
+## 샘플 데이터
+
+카드 12개에 케이스를 섞어 넣었습니다.
+
+- **상품명** — 영문 6 / 국문 6, 1줄 · 2줄 · 2줄 초과(말줄임) 각각 포함
+  영문명은 `.name.en` 으로 Work Sans, 국문명은 Pretendard
+- **가격** — 정가만 6 / 세일가 + 원가(취소선) 6
+- 첫 카드에 `SOLD OUT` 뱃지
+
+상품명 길이가 달라도 행 내 가격 라인이 어긋나지 않도록 `.name` 에
+`min-height: 3.2em` (2줄 슬롯)을, `.info` 에 `flex: 1 1 auto` 를 적용했습니다.
+
 ## 참고
 
 `.status-bar` 와 `.browser-bar` 는 디바이스 목업입니다. 실서비스 적용 시 두 블록과

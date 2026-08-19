@@ -294,10 +294,12 @@
     align-items: flex-start;
     gap: var(--mid-2);
     width: 100%;
+    flex: 1 1 auto;                /* 이름 길이가 달라도 카드 하단선 정렬 */
     padding: var(--mid-16) var(--mid-12);
     border-bottom: 1px solid var(--c-line);
   }
   .product-group .row:last-child .info { border-bottom: 0; }
+  .card .name.en { font-family: var(--font-en); }   /* 영문 상품명 */
   .card .name {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -305,6 +307,7 @@
     overflow: hidden;
     width: 100%;
     font-family: var(--font-kr);
+    min-height: 3.2em;             /* Max 2line 슬롯 확보 → 행 내 가격 라인 정렬 */
     font-size: var(--fs-p4);       /* 13px — 고정 */
     line-height: 1.6;
     color: var(--c-text);
@@ -464,133 +467,127 @@
   <div class="product-group">
     <div class="row">
       <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
+        <div class="thumb"><img src="assets/thumbnail.png" alt="Glow Moisturising Cream 50ml"></div>
         <span class="badge">SOLD OUT</span>
         <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
+          <p class="name en">Glow Moisturising Cream 50ml</p>
           <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
+            <span class="now"><span class="num">38,000</span><span class="won">원</span></span>
+            <span class="was"><span class="num">52,000</span><span class="won">원</span></span>
           </div>
         </div>
       </article>
       <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
+        <div class="thumb"><img src="assets/thumbnail.png" alt="펩타이드 리뉴얼 세럼"></div>
         <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
+          <p class="name">펩타이드 리뉴얼 세럼</p>
           <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-    </div>
-    <div class="row">
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
-        <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
-          <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
-        <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
-          <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
+            <span class="now"><span class="num">128,000</span><span class="won">원</span></span>
           </div>
         </div>
       </article>
     </div>
     <div class="row">
       <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
+        <div class="thumb"><img src="assets/thumbnail.png" alt="와일드 베리 핸드 로션 300ml 대용량 리필 기획세트"></div>
         <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
+          <p class="name">와일드 베리 핸드 로션 300ml 대용량 리필 기획세트</p>
           <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
+            <span class="now"><span class="num">19,200</span><span class="won">원</span></span>
+            <span class="was"><span class="num">24,000</span><span class="won">원</span></span>
           </div>
         </div>
       </article>
       <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
+        <div class="thumb"><img src="assets/thumbnail.png" alt="Sea Salt Body Scrub"></div>
         <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
+          <p class="name en">Sea Salt Body Scrub</p>
           <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-    </div>
-    <div class="row">
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
-        <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
-          <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
-        <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
-          <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
+            <span class="now"><span class="num">42,000</span><span class="won">원</span></span>
           </div>
         </div>
       </article>
     </div>
     <div class="row">
       <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
+        <div class="thumb"><img src="assets/thumbnail.png" alt="Peptides Renewal Serum Concentrate Advanced Formula"></div>
         <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
+          <p class="name en">Peptides Renewal Serum Concentrate Advanced Formula</p>
           <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
+            <span class="now"><span class="num">96,000</span><span class="won">원</span></span>
+            <span class="was"><span class="num">128,000</span><span class="won">원</span></span>
           </div>
         </div>
       </article>
       <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
+        <div class="thumb"><img src="assets/thumbnail.png" alt="Bergamot & Patchouli Eau de Parfum 100ml"></div>
         <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
+          <p class="name en">Bergamot & Patchouli Eau de Parfum 100ml</p>
           <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
+            <span class="now"><span class="num">186,000</span><span class="won">원</span></span>
           </div>
         </div>
       </article>
     </div>
     <div class="row">
       <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
+        <div class="thumb"><img src="assets/thumbnail.png" alt="글로우 모이스처라이징 크림"></div>
         <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
+          <p class="name">글로우 모이스처라이징 크림</p>
           <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
+            <span class="now"><span class="num">52,000</span><span class="won">원</span></span>
           </div>
         </div>
       </article>
       <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Product Name Max 2line"></div>
+        <div class="thumb"><img src="assets/thumbnail.png" alt="베르가못 앤 파출리 오 드 퍼퓸 100ml"></div>
         <div class="info">
-          <p class="name">Product Name Max 2line Product Name Max 2line</p>
+          <p class="name">베르가못 앤 파출리 오 드 퍼퓸 100ml</p>
           <div class="price">
-            <span class="now"><span class="num">000,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">000,000</span><span class="won">원</span></span>
+            <span class="now"><span class="num">148,800</span><span class="won">원</span></span>
+            <span class="was"><span class="num">186,000</span><span class="won">원</span></span>
+          </div>
+        </div>
+      </article>
+    </div>
+    <div class="row">
+      <article class="card">
+        <div class="thumb"><img src="assets/thumbnail.png" alt="Nourishing Lip Balm Duo"></div>
+        <div class="info">
+          <p class="name en">Nourishing Lip Balm Duo</p>
+          <div class="price">
+            <span class="now"><span class="num">18,000</span><span class="won">원</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="assets/thumbnail.png" alt="너리싱 립밤 듀오 기획세트 2종"></div>
+        <div class="info">
+          <p class="name">너리싱 립밤 듀오 기획세트 2종</p>
+          <div class="price">
+            <span class="now"><span class="num">14,400</span><span class="won">원</span></span>
+            <span class="was"><span class="num">18,000</span><span class="won">원</span></span>
+          </div>
+        </div>
+      </article>
+    </div>
+    <div class="row">
+      <article class="card">
+        <div class="thumb"><img src="assets/thumbnail.png" alt="시 솔트 바디 스크럽 350ml"></div>
+        <div class="info">
+          <p class="name">시 솔트 바디 스크럽 350ml</p>
+          <div class="price">
+            <span class="now"><span class="num">42,000</span><span class="won">원</span></span>
+          </div>
+        </div>
+      </article>
+      <article class="card">
+        <div class="thumb"><img src="assets/thumbnail.png" alt="Wild Berry Hand Lotion Refill 300ml Limited Edition Set"></div>
+        <div class="info">
+          <p class="name en">Wild Berry Hand Lotion Refill 300ml Limited Edition Set</p>
+          <div class="price">
+            <span class="now"><span class="num">33,600</span><span class="won">원</span></span>
+            <span class="was"><span class="num">42,000</span><span class="won">원</span></span>
           </div>
         </div>
       </article>
