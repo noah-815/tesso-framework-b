@@ -62,7 +62,9 @@ assets/         # Figma 익스포트 (search, chevron-left/right, status-levels,
 `mid-*` 는 명세대로 450px 캡 없이 100vw 로 계속 증가합니다. 타이포와 동일하게 450px 에서
 멈추려면 `--us: calc(var(--tw) / 390);` 한 줄로 교체하면 됩니다.
 
-### 3. search 컴포넌트 — em (@base `p4` = 13px)
+### 3. em 적용
+
+**search** — @base `paragraph-4` 13px
 
 | 항목 | 값 | em |
 |---|---|---|
@@ -70,6 +72,15 @@ assets/         # Figma 익스포트 (search, chevron-left/right, status-levels,
 | 하단 padding | 14px | `1.0769em` |
 | text ↔ total gap | 13px | `1em` |
 | 아이콘 크기 | 21px | `1.6154em` |
+
+**badge** — @base `caption-2` 12px
+
+| 항목 | 값 | em |
+|---|---|---|
+| 상하 padding | 8px | `0.6667em` |
+| 좌우 padding | 10px | `0.8333em` |
+
+`left` / `top` 12px 은 썸네일 모서리 기준 위치값이라 px 유지.
 
 ### 4. 폰트 — 영문 Work Sans / 국문 Pretendard
 
@@ -84,7 +95,7 @@ Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백됩니�
 ### 5. 그 외
 
 토큰/정의가 없는 값은 px — header 60px, statusBar 54px, searchArea 좌우 16px,
-badge(left/top 12px · padding 8/10px), pagination 버튼 32px · 글리프 24px, hairline 1px.
+badge left/top 12px, pagination 버튼 32px · 글리프 24px, hairline 1px.
 
 ## 검증
 
@@ -95,6 +106,7 @@ badge(left/top 12px · padding 8/10px), pagination 버튼 32px · 글리프 24px
 | `paragraph-3` | 11.49px | 14px | 16.15px |
 | BRAND / statusBar 시간 | 20 / 17px | 20 / 17px | 20 / 17px |
 | search 아이콘 (1.6154em) | 17.23px | 21px | 24.23px |
+| badge padding (0.6667/0.8333em) | 6.56 / 8.20px | 8 / 10px | 9.23 / 11.54px |
 | `mid-2` / `4` / `6` / `8` | 2 / 4 / 6 / 8px | 2 / 4 / 6 / 8px | 2 / 4 / 6 / 8px |
 | `mid-12` / `16` / `24` / `40` | 11.3 / 14.6 / 21.1 / 34.3px | 12 / 16 / 24 / 40px | 15.9 / 23.7 / 39.5 / 70.9px |
 | 가로 스크롤 | 없음 | 없음 | 없음 |

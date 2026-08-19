@@ -21,8 +21,9 @@
      2) Spacing (mid-* 토큰)
         (값 − 8) × 100vw / 390 + 8
         · 값 < 8 인 토큰은 공식 제외 — 값 그대로 px 고정
-     3) search 컴포넌트
-        상하 padding / text↔total gap / 아이콘 크기 = em (@base p4 = 13px)
+     3) em 적용
+        · search — 상하 padding / text↔total gap / 아이콘 크기 (@base p4 = 13px)
+        · badge  — padding (@base c2 = 12px)
      4) 그 외 = px
      5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
      ───────────────────────────────────────────────────────────── */
@@ -277,9 +278,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 10px;
+    padding: 0.6667em 0.8333em;    /* 8px / 10px @ c2 12px — em */
     background: #111;
-    font-size: var(--fs-c2);       /* 12px @390 — 가변 */
+    font-size: var(--fs-c2);       /* 12px @390 — 가변 · em base */
     line-height: 1.2;
     color: #fff;
     white-space: nowrap;
