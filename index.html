@@ -16,29 +16,30 @@
         font-size = size value × screen width / 390
         · size value = rem (1rem = 14px)
         · 450px 이후 고정  → --tw: min(100vw, 450px)
-        · size value ≤ 1rem(14px) 은 뷰포트와 무관하게 px 고정
-        ※ 이 화면의 텍스트는 전부 고정 — statusBar 시간(17px)과 BRAND 로고(20px)는
-          가변 로직 제외 대상으로 지정되어 px 고정, 나머지는 모두 ≤ 1rem
+        · "size value ≤ 1rem 은 고정" 예외는 모바일에서 적용하지 않음 → 전부 가변
+        ※ statusBar 시간(17px) / BRAND 로고(20px) 만 가변 로직 제외 → px 고정
      2) Spacing (mid-* 토큰)
         (값 − 8) × 100vw / 390 + 8
         · 값 < 8 인 토큰은 공식 제외 — 값 그대로 px 고정
      3) search 컴포넌트
         상하 padding / text↔total gap / 아이콘 크기 = em (@base p4 = 13px)
      4) 그 외 = px
+     5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
      ───────────────────────────────────────────────────────────── */
   :root {
     /* 기준 단위 -------------------------------------------------- */
     --tw: min(100vw, 450px);        /* 타이포 기준 폭 (450px 이후 고정) */
+    --ut: calc(var(--tw) / 390);    /* 타이포 1px */
     --us: calc(100vw / 390);        /* spacing 1px (mid-* 계산용) */
     /* ↑ mid-* 는 명세대로 450px 고정 없이 100vw 로 계속 증가한다.
        타이포와 동일하게 450px 에서 멈추려면 아래 한 줄로 교체:
        --us: calc(var(--tw) / 390);                                   */
 
-    /* Typography — size value ≤ 1rem(14px) → 고정 ------------------ */
-    --fs-c2: 12px;                  /* caption-2      0.857rem → 고정 */
-    --fs-c1: 13px;                  /* caption-1      0.929rem → 고정 */
-    --fs-p4: 13px;                  /* paragraph-4    0.929rem → 고정 */
-    --fs-p3: 14px;                  /* paragraph-3    1rem     → 고정 */
+    /* Typography — 전부 가변 (450px 이후 고정) --------------------- */
+    --fs-c2: calc(12 * var(--ut));  /* caption-2   12px @390 */
+    --fs-c1: calc(13 * var(--ut));  /* caption-1   13px @390 */
+    --fs-p4: calc(13 * var(--ut));  /* paragraph-4 13px @390 */
+    --fs-p3: calc(14 * var(--ut));  /* paragraph-3 14px @390 */
     /* 가변 로직 제외 → px 고정 */
     --fs-logo: 20px;                /* BRAND 로고     — 고정 */
     --fs-status: 17px;              /* statusBar 시간 — 고정 */
@@ -57,8 +58,10 @@
     --mid-40: calc(32 * var(--us) + 8px);
 
     /* Font / Color ----------------------------------------------- */
-    --font-kr: "Pretendard Variable", Pretendard, sans-serif;
-    --font-en: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
+    /* 영문 = Work Sans, 국문 = Pretendard.
+       Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백된다.
+       "와일드 베리 300ml" 처럼 섞인 문자열도 문자 단위로 갈린다. */
+    --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
     --c-text: #111;
     --c-header-text: #372320;
     --c-line: rgba(0, 0, 0, 0.1);
@@ -73,7 +76,7 @@
     overflow-x: hidden;            /* 100vw 기반 계산 시 가로 스크롤 방지 */
   }
   body {
-    font-family: var(--font-en);
+    font-family: var(--font);
     color: var(--c-text);
     background: #fff;
     word-break: keep-all;
@@ -107,7 +110,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: var(--font-en);
     font-weight: 600;
     font-size: var(--fs-status);   /* 17px — 고정 */
     line-height: 22px;
@@ -136,8 +138,7 @@
     align-items: center;
     height: 48px;
     min-width: 48px;
-    font-family: var(--font-kr);
-    font-size: var(--fs-c1);       /* 13px — 고정 */
+    font-size: var(--fs-c1);       /* 13px @390 — 가변 */
     line-height: normal;
     text-transform: uppercase;
     color: var(--c-header-text);
@@ -149,7 +150,6 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    font-family: "Inter", var(--font-en);
     font-weight: 600;
     font-size: var(--fs-logo);     /* 20px — 고정 */
     line-height: 1.4;
@@ -172,7 +172,7 @@
     min-width: 0;
     display: flex;
     align-items: center;
-    font-size: var(--fs-p4);       /* em base = 13px */
+    font-size: var(--fs-p4);       /* em base = 13px @390 — 가변 */
     gap: 1em;                      /* 13px : text ↔ total */
     padding-top: 1em;              /* 13px */
     padding-bottom: 1.0769em;      /* 14px */
@@ -207,8 +207,7 @@
     min-width: 0;
   }
   .search-keyword p {
-    font-family: var(--font-kr);
-    font-size: var(--fs-p4);       /* 13px — 고정 */
+    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
     line-height: 1.6;
     color: var(--c-text);
     white-space: nowrap;
@@ -220,14 +219,12 @@
     display: flex;
     align-items: flex-start;
     gap: var(--mid-6);
-    font-size: var(--fs-c1);       /* 13px — 고정 */
+    font-size: var(--fs-c1);       /* 13px @390 — 가변 */
     line-height: 1.2;
     text-align: right;
     white-space: nowrap;
     color: var(--c-text);
   }
-  .search-total .label { font-family: var(--font-kr); }
-  .search-total .count { font-family: var(--font-en); }
 
   /* ── content ─────────────────────────────────────────────────── */
   .content {
@@ -282,8 +279,7 @@
     justify-content: center;
     padding: 8px 10px;
     background: #111;
-    font-family: var(--font-kr);
-    font-size: var(--fs-c2);       /* 12px — 고정 */
+    font-size: var(--fs-c2);       /* 12px @390 — 가변 */
     line-height: 1.2;
     color: #fff;
     white-space: nowrap;
@@ -299,16 +295,14 @@
     border-bottom: 1px solid var(--c-line);
   }
   .product-group .row:last-child .info { border-bottom: 0; }
-  .card .name.en { font-family: var(--font-en); }   /* 영문 상품명 */
   .card .name {
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     width: 100%;
-    font-family: var(--font-kr);
     min-height: 3.2em;             /* Max 2line 슬롯 확보 → 행 내 가격 라인 정렬 */
-    font-size: var(--fs-p4);       /* 13px — 고정 */
+    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
     line-height: 1.6;
     color: var(--c-text);
     text-overflow: ellipsis;
@@ -321,7 +315,7 @@
   .card .price .now {
     display: inline-flex;
     align-items: center;
-    font-size: var(--fs-p4);       /* 13px — 고정 */
+    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
     line-height: 1.6;
     color: var(--c-text);
     white-space: nowrap;
@@ -331,7 +325,7 @@
     display: inline-flex;
     align-items: baseline;
     justify-content: center;
-    font-size: var(--fs-c2);       /* 12px — 고정 */
+    font-size: var(--fs-c2);       /* 12px @390 — 가변 */
     line-height: 1.2;
     color: var(--c-text);
     opacity: 0.5;
@@ -347,8 +341,6 @@
     background: #111;
     transform: translateY(-50%);
   }
-  .card .price .num { font-family: var(--font-en); }
-  .card .price .won { font-family: var(--font-kr); }
 
   /* ── pagination ──────────────────────────────────────────────── */
   .pagination {
@@ -392,8 +384,7 @@
     align-items: center;
     gap: 8px;
     padding: 4px;
-    font-family: var(--font-en);
-    font-size: var(--fs-p3);       /* 14px = 1rem — 고정 */
+    font-size: var(--fs-p3);       /* 14px @390 — 가변 */
     line-height: 1.6;
     text-align: center;
     color: #1d1d1d;
@@ -425,9 +416,8 @@
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 2px 40px 0 rgba(0, 0, 0, 0.1);
-    font-family: var(--font-en);
     font-weight: 500;
-    font-size: 12px;               /* 0.857rem ≤ 1rem → 고정 */
+    font-size: 12px;               /* 디바이스 목업 — 고정 */
     letter-spacing: 0.12px;
     color: #000;
     white-space: nowrap;
@@ -470,7 +460,7 @@
         <div class="thumb"><img src="assets/thumbnail.png" alt="Glow Moisturising Cream 50ml"></div>
         <span class="badge">SOLD OUT</span>
         <div class="info">
-          <p class="name en">Glow Moisturising Cream 50ml</p>
+          <p class="name">Glow Moisturising Cream 50ml</p>
           <div class="price">
             <span class="now"><span class="num">38,000</span><span class="won">원</span></span>
             <span class="was"><span class="num">52,000</span><span class="won">원</span></span>
@@ -501,7 +491,7 @@
       <article class="card">
         <div class="thumb"><img src="assets/thumbnail.png" alt="Sea Salt Body Scrub"></div>
         <div class="info">
-          <p class="name en">Sea Salt Body Scrub</p>
+          <p class="name">Sea Salt Body Scrub</p>
           <div class="price">
             <span class="now"><span class="num">42,000</span><span class="won">원</span></span>
           </div>
@@ -512,7 +502,7 @@
       <article class="card">
         <div class="thumb"><img src="assets/thumbnail.png" alt="Peptides Renewal Serum Concentrate Advanced Formula"></div>
         <div class="info">
-          <p class="name en">Peptides Renewal Serum Concentrate Advanced Formula</p>
+          <p class="name">Peptides Renewal Serum Concentrate Advanced Formula</p>
           <div class="price">
             <span class="now"><span class="num">96,000</span><span class="won">원</span></span>
             <span class="was"><span class="num">128,000</span><span class="won">원</span></span>
@@ -522,7 +512,7 @@
       <article class="card">
         <div class="thumb"><img src="assets/thumbnail.png" alt="Bergamot & Patchouli Eau de Parfum 100ml"></div>
         <div class="info">
-          <p class="name en">Bergamot & Patchouli Eau de Parfum 100ml</p>
+          <p class="name">Bergamot & Patchouli Eau de Parfum 100ml</p>
           <div class="price">
             <span class="now"><span class="num">186,000</span><span class="won">원</span></span>
           </div>
@@ -554,7 +544,7 @@
       <article class="card">
         <div class="thumb"><img src="assets/thumbnail.png" alt="Nourishing Lip Balm Duo"></div>
         <div class="info">
-          <p class="name en">Nourishing Lip Balm Duo</p>
+          <p class="name">Nourishing Lip Balm Duo</p>
           <div class="price">
             <span class="now"><span class="num">18,000</span><span class="won">원</span></span>
           </div>
@@ -584,7 +574,7 @@
       <article class="card">
         <div class="thumb"><img src="assets/thumbnail.png" alt="Wild Berry Hand Lotion Refill 300ml Limited Edition Set"></div>
         <div class="info">
-          <p class="name en">Wild Berry Hand Lotion Refill 300ml Limited Edition Set</p>
+          <p class="name">Wild Berry Hand Lotion Refill 300ml Limited Edition Set</p>
           <div class="price">
             <span class="now"><span class="num">33,600</span><span class="won">원</span></span>
             <span class="was"><span class="num">42,000</span><span class="won">원</span></span>
