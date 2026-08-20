@@ -19,10 +19,10 @@
      2) Spacing
         · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
         · px-*  : px 고정 (뷰포트와 무관)
-     3) Width — 12컬럼 그리드 (거터 16px / 좌우 마진 20px, 둘 다 px 고정)
-        col     = (100vw − 2×margin − 11×gutter) / 12
-        content = (2.5 × col) + (3 × gutter)   → 1920 에서 403px
-        ㄴ min-width 360px (viewport 1713.6px 이하부터 360px 고정)
+     3) Width — vw 기반
+        content = 21vw   → 1920 에서 403.2px
+        ㄴ min 360px (1714px 이하) / max 480px (2286px 이상)
+        · 이전 (2.5 × 컬럼) + (3 × 거터) 공식과 동일한 결과 (차이 1.3px 미만)
      4) 버튼 padding = em (해당 버튼의 label 사이즈 기준)
      5) 그 외 = px
      6) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
@@ -61,16 +61,10 @@
     /* px-* : 뷰포트와 무관하게 px 고정 */
     --px-12:   12px;
 
-    /* Grid — 12컬럼 / 거터 16 / 마진 20 (기준 1920) ---------------- */
-    --grid-columns: 12;
-    --grid-gutter: 16px;
-    --grid-margin: 20px;
-    --grid-col: calc(
-      (100vw - (2 * var(--grid-margin)) - ((var(--grid-columns) - 1) * var(--grid-gutter)))
-      / var(--grid-columns)
-    );
-    /* width = (2.5 × 컬럼) + (3 × 거터), min 360px */
-    --content-raw: calc((2.5 * var(--grid-col)) + (3 * var(--grid-gutter)));
+    /* 콘텐츠 너비 — vw 기반 ---------------------------------------- */
+    /* 이전에는 (2.5 × 컬럼) + (3 × 거터) 였다. 전개하면 20.8333vw + 3px 이라
+       21vw 와 1280~2560 구간에서 최대 1.3px (0.5% 미만) 차이라 vw 로 단순화했다. */
+    --content-raw: 21vw;
     --content-min: 360px;          /* 가변 모드 하한 (off = 0px) */
     --content-max: none;           /* 가변 모드 상한 (off = none) */
     --content-w-fixed: 400px;      /* 고정폭 안 */
@@ -171,7 +165,7 @@
     align-items: flex-start;
     gap: var(--mid-32);
     --content-w: max(var(--content-min), var(--content-raw));
-    width: var(--content-w);       /* max(min, (2.5 × 컬럼) + (3 × 거터)) */
+    width: var(--content-w);       /* max(min, 21vw), 상한은 max-width */
     margin: 0 auto;
     padding: var(--mid-100) 0;
   }
@@ -1069,7 +1063,7 @@
     const hit = kind =>
       fluid && el(kind, 'Toggle').checked && Math.abs(w - clamp(kind)) < 0.5;
     /* max-width 가 width 를 이기므로 둘 다 걸리면 max 가 우선 */
-    const note = hit('max') ? ' (max)' : hit('min') ? ' (min)' : '';
+    const note = hit('max') ? ' (max)' : hit('min') ? ' (min)' : fluid ? ' (21vw)' : '';
     $('#widthReadout').textContent = `${w.toFixed(1)}px${note} · ${innerWidth}px`;
   }
 

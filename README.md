@@ -49,8 +49,8 @@ Figma `-0_Current / 02_Framework B` 시안을 가변 규칙에 따라 구현한 
   `0.0083 × screen width` = `0.83vw`. size value ≤ 1rem 은 고정.
 - **spacing** `mid-*` = `(값 − 8) × 100vw / 1920 + 8`, 값 < 8 이면 값 그대로 고정.
   `px-*` 는 px 고정.
-- **width** `(2.5 × 컬럼) + (3 × 거터)`, min 360px.
-  12컬럼 / 거터 16px / 좌우 마진 20px → 1920 에서 403px.
+- **width** 로그인·회원가입 콘텐츠 = `21vw`, min 360px / max 480px.
+  1920 에서 403.2px. (이전 `(2.5 × 컬럼) + (3 × 거터)` 공식과 최대 1.3px 차이)
 
 ### 공통 — 버튼 padding
 
