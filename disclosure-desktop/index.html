@@ -22,15 +22,22 @@
      3) 다이얼로그 box 가로 너비 = 560px 고정
      4) 그 외 = px
      5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+     ※ 헤더 타이틀은 우하단 데모 패널에서 P1~P4 로 바꿔 볼 수 있다 (기본 = 시안값 P2).
+       P1/P2 는 1rem 초과라 가변, P3(1rem)/P4(0.929rem) 는 고정이다.
      ───────────────────────────────────────────────────────────── */
   :root {
     /* 기준 단위 -------------------------------------------------- */
     --us: calc(100vw / 1920);       /* spacing 1px (mid-* 계산용) */
 
     /* Typography ------------------------------------------------- */
+    --fs-p4:    13px;               /* paragraph-4        0.929rem → 고정 */
     --fs-p3:    14px;               /* paragraph-3        1rem     → 고정 */
     --fs-btn-l: 13px;               /* button-label-large 0.929rem → 고정 */
     --fs-p2:    calc((1.1429 - 1) * 0.83vw + 1rem);   /* paragraph-2 16px @1920 — 가변 */
+    --fs-p1:    calc((1.2857 - 1) * 0.83vw + 1rem);   /* paragraph-1 18px @1920 — 가변 */
+
+    /* 헤더 타이틀 사이즈 — 시안 기본값은 P2 */
+    --fs-title: var(--fs-p2);
 
     /* Spacing — mid-* : (값 − 8) × 100vw / 1920 + 8 ---------------- */
     --mid-8:  8px;                  /* 공식 결과도 8px (증감 없음) */
@@ -50,6 +57,12 @@
     --c-text: #111;
     --c-dim: rgba(0, 0, 0, 0.5);
   }
+
+  /* 헤더 타이틀 사이즈 전환 (데모) */
+  body[data-title="p1"] { --fs-title: var(--fs-p1); }
+  body[data-title="p2"] { --fs-title: var(--fs-p2); }
+  body[data-title="p3"] { --fs-title: var(--fs-p3); }
+  body[data-title="p4"] { --fs-title: var(--fs-p4); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html {
@@ -99,7 +112,7 @@
     flex: 1 0 0;
     min-width: 0;
     font-weight: 500;
-    font-size: var(--fs-p2);       /* 16px @1920 — 가변 */
+    font-size: var(--fs-title);    /* 기본 P2 = 16px @1920 — 가변 */
     line-height: 1.6;
     color: var(--c-text);
   }
@@ -147,6 +160,34 @@
     color: #fff;
     white-space: nowrap;
   }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-readout { color: #999; font-variant-numeric: tabular-nums; }
+
 </style>
 </head>
 <body>
@@ -192,6 +233,52 @@ o 로그 기록
     <button type="button" class="btn">확인</button>
   </div>
 </div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <strong>title</strong>
+  <div class="demo-seg" id="titleToggle">
+    <button type="button" data-title-size="p1">P1</button>
+    <button type="button" data-title-size="p2">P2</button>
+    <button type="button" data-title-size="p3">P3</button>
+    <button type="button" data-title-size="p4">P4</button>
+  </div>
+  <span class="demo-readout" id="titleReadout">–</span>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const KEY = 'fw-b-disclosure-desktop-title-size';
+  const DESIGN = { p1: 18, p2: 16, p3: 14, p4: 13 };   /* @1920 기준 px */
+  const FIXED  = { p3: true, p4: true };               /* ≤ 1rem → 뷰포트와 무관하게 고정 */
+
+  function setTitleSize(size) {
+    document.body.dataset.title = size;
+    $$('#titleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.titleSize === size));
+    try { localStorage.setItem(KEY, size); } catch (e) {}
+    readout();
+  }
+
+  function readout() {
+    const size = document.body.dataset.title;
+    const actual = parseFloat(getComputedStyle($('.dialog .title')).fontSize);
+    const note = FIXED[size] ? ' (고정)' : '';
+    $('#titleReadout').textContent = `${DESIGN[size]}px @1920${note} · ${actual.toFixed(1)}px`;
+  }
+
+  $('#titleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-title-size]');
+    if (b) setTitleSize(b.dataset.titleSize);
+  });
+  window.addEventListener('resize', readout);
+
+  let saved = 'p2';
+  try { saved = localStorage.getItem(KEY) || 'p2'; } catch (e) {}
+  setTitleSize(saved);
+})();
+</script>
 
 </body>
 </html>
