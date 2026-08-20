@@ -69,9 +69,12 @@
       / var(--grid-columns)
     );
     /* width = (2.5 × 컬럼) + (3 × 거터), min 360px */
-    --content-w: max(360px, calc((2.5 * var(--grid-col)) + (3 * var(--grid-gutter))));
-    --content-w-fixed: 400px;      /* 고정폭 안 */
+    --content-raw: calc((2.5 * var(--grid-col)) + (3 * var(--grid-gutter)));
+    --content-min: 360px;          /* 가변 모드 하한 (off = 0px) */
     --content-max: none;           /* 가변 모드 상한 (off = none) */
+    --content-w-fixed: 400px;      /* 고정폭 안 */
+    /* --content-w 는 .card 에서 조합한다 — custom property 는 선언된 요소에서
+       var() 가 치환되므로, :root 에 두면 body 의 --content-min 변경이 먹지 않는다 */
 
     /* Font / Color ----------------------------------------------- */
     /* 영문 = Work Sans, 국문 = Pretendard.
@@ -91,8 +94,9 @@
   }
 
   /* 가로 너비 모드 — fluid(그리드 가변) / fixed(400px 고정) */
-  body[data-width="fixed"] { --content-w: var(--content-w-fixed); }
-  /* max 는 가변 모드에서만 적용 */
+  /* 고정폭 안 — 너비를 400px 로 덮어쓴다 */
+  body[data-width="fixed"] .card { --content-w: var(--content-w-fixed); }
+  /* min / max 는 가변 모드에서만 적용 */
   body[data-width="fluid"] .card { max-width: var(--content-max); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -165,7 +169,8 @@
     flex-direction: column;
     align-items: flex-start;
     gap: var(--mid-32);
-    width: var(--content-w);       /* (2.5 × 컬럼) + (3 × 거터), min 360px */
+    --content-w: max(var(--content-min), var(--content-raw));
+    width: var(--content-w);       /* max(min, (2.5 × 컬럼) + (3 × 거터)) */
     margin: 0 auto;
     padding: var(--mid-100) 0;
   }
@@ -544,9 +549,9 @@
   .demo-seg button + button { border-left: 1px solid var(--c-line); }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
   .demo-readout { color: #999; font-variant-numeric: tabular-nums; }
-  .demo-max { display: flex; align-items: center; gap: 6px; color: #777; }
-  .demo-max label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
-  .demo-max input[type="number"] {
+  .demo-limit { display: flex; align-items: center; gap: 6px; color: #777; }
+  .demo-limit label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+  .demo-limit input[type="number"] {
     width: 56px;
     padding: 3px 5px;
     border: 1px solid var(--c-line);
@@ -556,8 +561,8 @@
     text-align: right;
     color: #111;
   }
-  .demo-max input[type="number"]:disabled { color: #bbb; background: #fafafa; }
-  .demo-max.is-off { opacity: 0.55; }
+  .demo-limit input[type="number"]:disabled { color: #bbb; background: #fafafa; }
+  .demo-limit.is-off { opacity: 0.55; }
 </style>
 </head>
 <body>
@@ -870,7 +875,12 @@
     <button type="button" data-width-mode="fluid">가변</button>
     <button type="button" data-width-mode="fixed">고정 400</button>
   </div>
-  <div class="demo-max is-off" id="maxControl">
+  <div class="demo-limit" id="minControl">
+    <label><input type="checkbox" id="minToggle" checked> min</label>
+    <input type="number" id="minValue" min="200" max="4000" step="1" value="360">
+    <span>px</span>
+  </div>
+  <div class="demo-limit is-off" id="maxControl">
     <label><input type="checkbox" id="maxToggle"> max</label>
     <input type="number" id="maxValue" min="200" max="4000" step="1" value="403" disabled>
     <span>px</span>
@@ -1012,34 +1022,40 @@
     startTimer($('[data-timer]', active));
   }
 
-  /* ── 가로 너비 모드 · max 상한 (데모) ───────────────────────── */
+  /* ── 가로 너비 모드 · min/max 한계 (데모) ───────────────────── */
   const WIDTH_KEY = 'fw-b-login-width-mode';
-  const MAX_ON_KEY = 'fw-b-login-max-on';
-  const MAX_VAL_KEY = 'fw-b-login-max-value';
+  const LIMIT_KEYS = {
+    min: { on: 'fw-b-login-min-on',  val: 'fw-b-login-min-value',  def: '360', defOn: '1' },
+    max: { on: 'fw-b-login-max-on',  val: 'fw-b-login-max-value',  def: '403', defOn: '0' },
+  };
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const load  = (k, d) => { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } };
+
+  const el = (kind, part) => $(`#${kind}${part}`);           /* #minToggle / #maxValue … */
+  const clamp = kind => {
+    const raw = parseFloat(el(kind, 'Value').value);
+    return Number.isFinite(raw) ? Math.min(4000, Math.max(200, raw)) : null;
+  };
 
   function setWidthMode(mode) {
     document.body.dataset.width = mode;
     $$('#widthToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.widthMode === mode));
     store(WIDTH_KEY, mode);
-    applyMax();
+    applyLimits();
   }
 
-  const clampMax = () => {
-    const raw = parseFloat($('#maxValue').value);
-    return Number.isFinite(raw) ? Math.min(4000, Math.max(200, raw)) : null;
-  };
-
-  function applyMax() {
-    const on = $('#maxToggle').checked;
-    const val = clampMax();
-    $('#maxValue').disabled = !on;
-    $('#maxControl').classList.toggle('is-off', !on);
-    if (on && val !== null) document.body.style.setProperty('--content-max', val + 'px');
-    else document.body.style.removeProperty('--content-max');
-    store(MAX_ON_KEY, on ? '1' : '0');
-    if (val !== null) store(MAX_VAL_KEY, String(val));
+  function applyLimits() {
+    ['min', 'max'].forEach(kind => {
+      const on = el(kind, 'Toggle').checked;
+      const val = clamp(kind);
+      el(kind, 'Value').disabled = !on;
+      el(kind, 'Control').classList.toggle('is-off', !on);
+      const prop = kind === 'min' ? '--content-min' : '--content-max';
+      if (on && val !== null) document.body.style.setProperty(prop, val + 'px');
+      else document.body.style.setProperty(prop, kind === 'min' ? '0px' : 'none');
+      store(LIMIT_KEYS[kind].on, on ? '1' : '0');
+      if (val !== null) store(LIMIT_KEYS[kind].val, String(val));
+    });
     readout();
   }
 
@@ -1048,11 +1064,10 @@
     if (!card) return;
     const w = card.getBoundingClientRect().width;
     const fluid = document.body.dataset.width === 'fluid';
-    const maxOn = $('#maxToggle').checked;
-    const maxVal = clampMax();
-    let note = '';
-    if (fluid && Math.round(w) === 360) note = ' (min)';
-    else if (fluid && maxOn && Math.abs(w - maxVal) < 0.5) note = ' (max)';
+    const hit = kind =>
+      fluid && el(kind, 'Toggle').checked && Math.abs(w - clamp(kind)) < 0.5;
+    /* max-width 가 width 를 이기므로 둘 다 걸리면 max 가 우선 */
+    const note = hit('max') ? ' (max)' : hit('min') ? ' (min)' : '';
     $('#widthReadout').textContent = `${w.toFixed(1)}px${note} · ${innerWidth}px`;
   }
 
@@ -1060,19 +1075,24 @@
     const b = e.target.closest('[data-width-mode]');
     if (b) setWidthMode(b.dataset.widthMode);
   });
-  $('#maxToggle').addEventListener('change', applyMax);
-  $('#maxValue').addEventListener('input', applyMax);
-  $('#maxValue').addEventListener('change', () => {
-    const v = clampMax();
-    if (v !== null) $('#maxValue').value = v;   /* 범위 밖 입력은 확정 시 보정 */
-    applyMax();
+  ['min', 'max'].forEach(kind => {
+    el(kind, 'Toggle').addEventListener('change', applyLimits);
+    el(kind, 'Value').addEventListener('input', applyLimits);
+    el(kind, 'Value').addEventListener('change', () => {
+      const v = clamp(kind);
+      if (v !== null) el(kind, 'Value').value = v;   /* 범위 밖 입력은 확정 시 보정 */
+      applyLimits();
+    });
   });
   window.addEventListener('resize', readout);
 
   syncButtons();
   show('login');
-  $('#maxValue').value = load(MAX_VAL_KEY, '403');
-  $('#maxToggle').checked = load(MAX_ON_KEY, '0') === '1';
+  ['min', 'max'].forEach(kind => {
+    const k = LIMIT_KEYS[kind];
+    el(kind, 'Value').value = load(k.val, k.def);
+    el(kind, 'Toggle').checked = load(k.on, k.defOn) === '1';
+  });
   setWidthMode(load(WIDTH_KEY, 'fluid'));
 })();
 </script>

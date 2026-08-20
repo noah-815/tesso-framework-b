@@ -27,8 +27,8 @@ login ──(로그인, 계정 일치)──────────────
 데모 로그인 계정: `example@gmail.com` / `12345678` — 그 외 조합은 dialog로 빠집니다.
 
 우하단 패널(`width` 토글 + `flow` 목록)은 시안에 없는 **데모 컨트롤**입니다.
-`.demo-nav` / `.demo-seg` / `.demo-readout` / `.demo-max` CSS 와 `#demoNav` 마크업, 스크립트의
-`가로 너비 모드 · max 상한` 블록을 지우면 됩니다.
+`.demo-nav` / `.demo-seg` / `.demo-readout` / `.demo-limit` CSS 와 `#demoNav` 마크업, 스크립트의
+`가로 너비 모드 · min/max 한계` 블록을 지우면 됩니다.
 
 ## 단위 체계
 
@@ -83,9 +83,16 @@ login ──(로그인, 계정 일치)──────────────
 --grid-gutter: 16px;
 --grid-margin: 20px;
 --grid-col: calc((100vw - 2*var(--grid-margin) - 11*var(--grid-gutter)) / 12);
-/* width = (2.5 × 컬럼) + (3 × 거터), min 360px */
---content-w: max(360px, calc(2.5 * var(--grid-col) + 3 * var(--grid-gutter)));
+--content-raw: calc(2.5 * var(--grid-col) + 3 * var(--grid-gutter));
+--content-min: 360px;   /* min on 기본값 */
+--content-max: none;    /* max off 기본값 */
+
+.card { width: max(var(--content-min), var(--content-raw)); }
 ```
+
+`--content-w` 조합은 `:root` 가 아니라 `.card` 에서 합니다. custom property 는 선언된
+요소에서 `var()` 가 치환되므로, `:root` 에 두면 데모 패널이 `body` 에 심는
+`--content-min` 변경이 반영되지 않습니다.
 
 | viewport | col | 2.5col + 3거터 | 적용 |
 |---|---|---|---|
@@ -114,20 +121,30 @@ body[data-width="fluid"] .card { max-width: var(--content-max); }
 
 토큰 하나만 덮어쓰는 구조라, 어느 안으로 확정하든 `--content-w` 한 줄만 남기면 됩니다.
 
-#### max 상한
+#### min / max 한계
 
-가변 모드에 상한을 걸어 볼 수 있습니다. 패널의 `max` 체크박스를 켜면 옆 입력칸이 활성화되고,
+가변 모드에 하한·상한을 각각 켜고 끌 수 있습니다. 체크박스를 켜면 옆 입력칸이 활성화되고
 px 값을 넣으면 즉시 반영됩니다 (허용 범위 200–4000px, 범위 밖 입력은 확정 시 보정).
-on/off 와 값 모두 localStorage 에 저장됩니다. 상한이 실제로 걸린 순간에는 읽기값에
-`(max)` 가 붙습니다 — min 이 걸릴 때의 `(min)` 과 같은 방식입니다.
+on/off 와 값 모두 localStorage 에 저장됩니다.
 
-max 는 **가변 모드에서만** 적용되고 고정 400px 모드에서는 무시됩니다.
+기본값은 **min on 360px / max off** — 원래 명세 그대로입니다.
+한계가 실제로 걸린 순간 읽기값에 `(min)` / `(max)` 가 붙습니다.
 
-| viewport | 가변 (max off) | 가변 + max 403 | 고정 |
-|---|---|---|---|
-| 768 – 1713 | 360px (min) | 360px (min) | 400px |
-| 1920 | 403px | 403px (max) | 400px |
-| 2560 | 536.33px | 403px (max) | 400px |
+```css
+body[data-width="fluid"] .card { max-width: var(--content-max); }
+```
+
+둘 다 적용되고 min > max 인 경우 CSS 상 `max-width` 가 `width` 를 이기므로 **max 가 우선**
+합니다 (예: min 420 + max 390 → 390px). 읽기값도 `(max)` 로 표시됩니다.
+
+min·max 모두 **가변 모드에서만** 적용되고 고정 400px 모드에서는 무시됩니다.
+
+| viewport | 가변 (min 360 / max off) | 가변 (min off) | 가변 + max 403 | 고정 |
+|---|---|---|---|---|
+| 768 | 360px (min) | 163px | 360px (min) | 400px |
+| 1440 | 360px (min) | 303px | 360px (min) | 400px |
+| 1920 | 403px | 403px | 403px (max) | 400px |
+| 2560 | 536.33px | 536.33px | 403px (max) | 400px |
 
 | viewport | 가변 | 고정 |
 |---|---|---|
