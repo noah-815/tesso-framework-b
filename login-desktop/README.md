@@ -171,12 +171,31 @@ min·max 모두 **가변 모드에서만** 적용되고 고정 400px 모드에�
 | 1920 | 403px | 400px |
 | 2560 | 536.33px | 400px |
 
-### 4. 그 외 px
+### 4. em 적용
 
-header 64px, textField padding 13/14px, button padding 14/22px,
-dialog 400px, snackbar 320px, checkbox 16px, hairline 1px.
+**버튼 padding** — 해당 버튼 label 사이즈 기준
 
-### 5. 폰트
+| 버튼 | 시안 px | em (@base) |
+|---|---|---|
+| 로그인 · 인증 요청 · 이메일 인증 · 회원가입 · 완료 | 14 / 22px | `1.0769em 1.6923em` (@ button-label-large 13px) |
+| 회원가입 · 비밀번호 찾기 (텍스트 버튼) | 9 / 0px | `0.75em 0` (@ button-label-small 12px) |
+
+**singleLine 상하 padding** — 입력 텍스트(`paragraph-4` 13px) 기준
+
+| 항목 | 시안 px | em |
+|---|---|---|
+| 상단 padding | 13px | `1em` |
+| 하단 padding | 14px | `1.0769em` |
+
+`.text-field` 에 `font-size: var(--fs-p4)` 를 함께 걸어 em 기준을 입력 텍스트 사이즈에
+맞췄습니다. 데스크탑에서는 두 label 과 `paragraph-4` 가 모두 ≤ 1rem 이라 고정이므로
+계산 결과는 시안 px 와 동일합니다.
+
+### 5. 그 외 px
+
+header 64px, dialog 400px, snackbar 320px, checkbox 16px, hairline 1px.
+
+### 6. 폰트
 
 ```css
 --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
