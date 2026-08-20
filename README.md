@@ -11,6 +11,7 @@ Figma `-0_Current / 02_Framework B` 시안을 가변 규칙에 따라 구현한 
 | [Login · Sign Up · Change Password](login-desktop/) | Desktop ≥ 768 | `2348:64115` | [열기](https://noah-815.github.io/tesso-framework-b/login-desktop/) |
 | [Disclosure Dialog](disclosure-desktop/) | Desktop ≥ 768 | `2828:20428` | [열기](https://noah-815.github.io/tesso-framework-b/disclosure-desktop/) |
 | [Address List Dialog](address-list-desktop/) | Desktop ≥ 768 | `2865:19307` | [열기](https://noah-815.github.io/tesso-framework-b/address-list-desktop/) |
+| [Review Dialog](review-dialog-desktop/) | Desktop ≥ 768 | `3584:128128` | [열기](https://noah-815.github.io/tesso-framework-b/review-dialog-desktop/) |
 | [Confirm Dialog](confirm-dialog-desktop/) | Desktop ≥ 768 | `4029:184793` | [열기](https://noah-815.github.io/tesso-framework-b/confirm-dialog-desktop/) |
 | [Disclosure Dialog](disclosure-mobile/) | Mobile ≤ 767 | `2828:20429` | [열기](https://noah-815.github.io/tesso-framework-b/disclosure-mobile/) |
 
@@ -46,6 +47,19 @@ Figma `-0_Current / 02_Framework B` 시안을 가변 규칙에 따라 구현한 
   `px-*` 는 px 고정.
 - **width** `(2.5 × 컬럼) + (3 × 거터)`, min 360px.
   12컬럼 / 거터 16px / 좌우 마진 20px → 1920 에서 403px.
+
+### 공통 — 버튼 padding
+
+버튼 padding 은 해당 버튼 label 사이즈를 기준으로 한 em 입니다.
+
+| label | 시안 px | em |
+|---|---|---|
+| `button-label-large` 13px | 14 / 22px | `1.0769em 1.6923em` |
+| `button-label-small` 12px | 9 / 15px | `0.75em 1.25em` |
+| `button-label-small` 12px | 9 / 0px | `0.75em 0` |
+
+데스크탑은 button label 이 ≤ 1rem 이라 고정이므로 계산 결과가 시안 px 와 같고,
+모바일은 label 이 가변이라 padding 도 함께 가변이 됩니다.
 
 ### 공통 — 폰트
 

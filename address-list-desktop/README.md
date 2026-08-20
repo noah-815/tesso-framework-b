@@ -104,11 +104,20 @@ body[data-box="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
 세로는 목록 영역 600px + 상하 영역으로 최대 800px 이고, `max-height: min(800px, 100%)`
 를 걸어 세로가 짧은 창에서는 창 높이에 맞춰 줄고 목록이 스크롤됩니다.
 
-### 4. 그 외 px
+### 4. 버튼 padding = em
+
+| 버튼 | 시안 px | em (@base) |
+|---|---|---|
+| 수정 · 삭제 | 9 / 0px | `0.75em 0` (@ button-label-small 12px) |
+| 선택 · 선택됨 | 9 / 15px | `0.75em 1.25em` (@ button-label-small 12px) |
+| 배송지 추가 | 14 / 22px | `1.0769em 1.6923em` (@ button-label-large 13px) |
+
+데스크탑에서는 button label 이 ≤ 1rem 이라 고정이므로 계산 결과는 시안 px 와 동일합니다.
+
+### 5. 그 외 px
 
 창 크롬 36 / 32px · 신호등 52×12 · favicon 22px · 라운드 10px,
-목록 영역 600px, 뱃지 padding 6/8px, 수정·삭제 padding 9px,
-선택 버튼 padding 9/15px · 체크 14px, 추가 버튼 padding 14/22px · plus 16px,
+목록 영역 600px, 뱃지 padding 6/8px, 체크 14px, plus 16px,
 divider 1×12px, hairline 1px.
 
 ### 5. 폰트

@@ -23,8 +23,9 @@
         col     = (100vw − 2×margin − 11×gutter) / 12
         content = (2.5 × col) + (3 × gutter)   → 1920 에서 403px
         ㄴ min-width 360px (viewport 1713.6px 이하부터 360px 고정)
-     4) 그 외 = px
-     5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+     4) 버튼 padding = em (해당 버튼의 label 사이즈 기준)
+     5) 그 외 = px
+     6) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
      ───────────────────────────────────────────────────────────── */
   :root {
     /* 기준 단위 -------------------------------------------------- */
@@ -273,7 +274,7 @@
     justify-content: center;
     gap: 4px;
     width: 100%;
-    padding: 14px 22px;            /* 토큰 없음 → px */
+    padding: 1.0769em 1.6923em;    /* 14px / 22px @ button-label-large 13px — em */
     border: 1px solid transparent;
     background: var(--c-disabled-bg);
     font-weight: 500;
@@ -303,7 +304,7 @@
     align-items: center;
     justify-content: center;
     gap: 4px;
-    padding: 9px 0;                /* 토큰 없음 → px */
+    padding: 0.75em 0;             /* 9px @ button-label-small 12px — em */
     font-size: var(--fs-btn-s);    /* 12px — 고정 */
     line-height: 1.2;
     text-align: center;

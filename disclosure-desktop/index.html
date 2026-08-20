@@ -24,8 +24,9 @@
         · 560 + px  : 너비 560px 고정 + 내부 여백 px 고정 (@1920 값)
         · vw + mid  : 너비 29.1667vw 가변 + 내부 여백 mid-* (가변)
           29.1667vw = 560 / 1920 → 1920 에서 560px
-     4) 그 외 = px
-     5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+     4) 버튼 padding = em (해당 버튼의 label 사이즈 기준)
+     5) 그 외 = px
+     6) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
      ※ 헤더 타이틀은 우하단 데모 패널에서 P1~P4 로 바꿔 볼 수 있다 (기본 = 시안값 P2).
        P1/P2 는 1rem 초과라 가변, P3(1rem)/P4(0.929rem) 는 고정이다.
      ───────────────────────────────────────────────────────────── */
@@ -165,7 +166,7 @@
     justify-content: center;
     gap: 4px;
     width: 100%;
-    padding: 14px 22px;            /* 토큰 없음 → px */
+    padding: 1.0769em 1.6923em;    /* 14px / 22px @ btn-large 13px — em */
     border: 1px solid transparent;
     background: #111;
     font-weight: 500;

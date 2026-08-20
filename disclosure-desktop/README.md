@@ -114,9 +114,14 @@ pad 는 `mid-24` (header/content/buttonArea 좌우) 기준입니다. 1920 에서
 세로는 세 안 공통으로 746px 기본에 상한 800px 이고, `max-height: min(800px, 100%)` 를
 함께 걸어 세로가 짧은 창에서는 창 높이에 맞춰 줄고 본문이 스크롤됩니다.
 
-### 4. 그 외 px
+### 4. 버튼 padding = em
 
-버튼 padding 14/22px, hairline 1px.
+확인 버튼 padding 은 `1.0769em 1.6923em` (14 / 22px @ button-label-large 13px).
+데스크탑에서는 label 이 ≤ 1rem 이라 고정이므로 계산 결과는 14 / 22px 로 동일합니다.
+
+### 5. 그 외 px
+
+hairline 1px.
 
 ### 5. 폰트
 

@@ -86,9 +86,15 @@ body[data-box="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
 
 pad 는 `mid-20` (다이얼로그 좌우) 기준입니다. 1920 에서는 세 안이 완전히 동일합니다.
 
-### 4. 그 외 px
+### 4. 버튼 padding = em
 
-버튼 padding 14/22px, hairline 1px, dim `rgba(0,0,0,0.5)`.
+버튼 padding 은 label 사이즈 기준 em 입니다 — 취소 · 로그인 모두
+`1.0769em 1.6923em` (14 / 22px @ button-label-large 13px).
+데스크탑에서는 label 이 ≤ 1rem 이라 고정이므로 계산 결과는 14 / 22px 로 동일합니다.
+
+### 5. 그 외 px
+
+hairline 1px, dim `rgba(0,0,0,0.5)`.
 
 ### 5. 폰트
 

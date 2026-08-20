@@ -76,11 +76,17 @@ body[data-title="p1"] { --fs-title: var(--fs-p1); }  /* p2 / p3 / p4 동일 */
 `mid-*` 는 명세대로 450px 캡 없이 100vw 로 계속 증가합니다. 타이포와 동일하게 450px 에서
 멈추려면 `--us: calc(var(--tw) / 390);` 한 줄로 교체하면 됩니다.
 
-### 3. 그 외 px
+### 3. 버튼 padding = em
 
-다이얼로그 높이 480px, 버튼 높이 44px · padding 14/22px, hairline 1px.
+확인 버튼 padding 은 `1.0769em 1.6923em` (14 / 22px @ button-label-large 13px).
+모바일은 label 사이즈가 가변이라 padding 도 함께 가변입니다 — 320 에서 11.5 / 18.0px,
+390 에서 14 / 22px, 450 이상에서 16.2 / 25.4px.
 
-### 4. 폰트
+### 4. 그 외 px
+
+다이얼로그 높이 480px, 버튼 높이 44px, hairline 1px.
+
+### 5. 폰트
 
 ```css
 --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
