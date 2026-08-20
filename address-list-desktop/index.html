@@ -58,7 +58,7 @@
     --dialog-w-fixed: 560px;              /* 고정 안 */
     --dialog-w-fluid: 29.1667vw;          /* 가변 안 — 560 / 1920, 1920 에서 560px */
     --dialog-w: var(--dialog-w-fixed);    /* 기본 = 고정 */
-    --dialog-max-h: 800px;
+    --dialog-max-h: 85vh;                 /* 높이 최대값 = 0.85 × 뷰포트 높이 */
     --content-h: 600px;
 
     /* Font / Color ----------------------------------------------- */
@@ -115,7 +115,7 @@
     flex-direction: column;
     align-items: flex-start;
     width: var(--dialog-w);        /* 고정 560px / 가변 29.1667vw */
-    max-height: min(var(--dialog-max-h), 100%);
+    max-height: var(--dialog-max-h);   /* 85vh */
     overflow: hidden;
     border-radius: 10px 10px 0 0;  /* 토큰 없음 → px */
     background: #fff;

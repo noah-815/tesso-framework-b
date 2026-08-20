@@ -55,7 +55,7 @@
     --dialog-w-fluid: 29.1667vw;          /* 가변 안 — 560 / 1920, 1920 에서 560px */
     --dialog-w: var(--dialog-w-fixed);    /* 기본 = 고정 */
     --dialog-h: 746px;
-    --dialog-max-h: 800px;
+    --dialog-max-h: 85vh;                 /* 높이 최대값 = 0.85 × 뷰포트 높이 */
 
     /* Font / Color ----------------------------------------------- */
     /* 영문 = Work Sans, 국문 = Pretendard.
@@ -111,7 +111,7 @@
     align-items: flex-start;
     width: var(--dialog-w);        /* 고정 560px / 가변 29.1667vw */
     height: var(--dialog-h);       /* 746px */
-    max-height: min(var(--dialog-max-h), 100%);
+    max-height: var(--dialog-max-h);   /* 85vh */
     overflow: hidden;
     background: #fff;
   }
