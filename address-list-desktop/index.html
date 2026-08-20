@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Address List Dialog — Desktop (Framework B)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Unit system — desktop (viewport ≥ 768)
+     디자인 기준 폭: 1920
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value = rem (1rem = 14px), 0.0083 × screen width = 0.83vw
+        · size value ≤ 1rem(14px) 은 뷰포트와 무관하게 px 고정
+     2) Spacing
+        · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
+        · px-*  : px 고정 — 이 화면에는 해당 없음
+     3) 다이얼로그 box — 세 가지 안을 토글로 비교
+        · 560 + mid : 너비 560px 고정 + 내부 여백 mid-* (가변)   ← 기본
+        · 560 + px  : 너비 560px 고정 + 내부 여백 px 고정 (@1920 값)
+        · vw + mid  : 너비 29.1667vw 가변 + 내부 여백 mid-* (가변)
+          29.1667vw = 560 / 1920 → 1920 에서 560px
+     4) 그 외 = px
+     5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+     ※ 헤더 타이틀은 우하단 데모 패널에서 P1~P4 로 바꿔 볼 수 있다 (기본 = 시안값 P2).
+       P1/P2 는 1rem 초과라 가변, P3(1rem)/P4(0.929rem) 는 고정이다.
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --us: calc(100vw / 1920);       /* spacing 1px (mid-* 계산용) */
+
+    /* Typography ------------------------------------------------- */
+    --fs-c2:    12px;               /* caption-2          0.857rem → 고정 */
+    --fs-p4:    13px;               /* paragraph-4        0.929rem → 고정 */
+    --fs-p3:    14px;               /* paragraph-3        1rem     → 고정 */
+    --fs-btn-s: 12px;               /* button-label-small 0.857rem → 고정 */
+    --fs-btn-l: 13px;               /* button-label-large 0.929rem → 고정 */
+    --fs-p2:    calc((1.1429 - 1) * 0.83vw + 1rem);   /* paragraph-2 16px @1920 — 가변 */
+    --fs-p1:    calc((1.2857 - 1) * 0.83vw + 1rem);   /* paragraph-1 18px @1920 — 가변 */
+
+    /* 헤더 타이틀 사이즈 — 시안 기본값은 P2 */
+    --fs-title: var(--fs-p2);
+
+    /* Spacing — mid-* : (값 − 8) × 100vw / 1920 + 8 ---------------- */
+    --mid-4:  4px;                  /* 값 < 8 → 값 그대로 고정 */
+    --mid-8:  8px;                  /* 공식 결과도 8px (증감 없음) */
+    --mid-12: calc( 4 * var(--us) + 8px);
+    --mid-16: calc( 8 * var(--us) + 8px);
+    --mid-20: calc(12 * var(--us) + 8px);
+    --mid-24: calc(16 * var(--us) + 8px);
+
+    /* 다이얼로그 box ---------------------------------------------- */
+    --dialog-w-fixed: 560px;              /* 고정 안 */
+    --dialog-w-fluid: 29.1667vw;          /* 가변 안 — 560 / 1920, 1920 에서 560px */
+    --dialog-w: var(--dialog-w-fixed);    /* 기본 = 고정 */
+    --dialog-max-h: 800px;
+    --content-h: 600px;
+
+    /* Font / Color ----------------------------------------------- */
+    /* 영문 = Work Sans, 국문 = Pretendard.
+       Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백된다. */
+    --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
+    --c-text: #111;
+    --c-sub: #6a6a6a;
+    --c-danger: #ef0000;
+    --c-line: rgba(0, 0, 0, 0.1);
+    --c-line-strong: rgba(0, 0, 0, 0.12);
+  }
+
+  /* 다이얼로그 box 안 전환 (데모) — --dialog-w 와 mid-* 만 덮어쓴다 */
+  body[data-box="fixed-px"] {         /* 내부 여백을 @1920 값으로 고정 */
+    --mid-4:  4px;
+    --mid-8:  8px;
+    --mid-12: 12px;
+    --mid-16: 16px;
+    --mid-20: 20px;
+    --mid-24: 24px;
+  }
+  body[data-box="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
+
+  /* 헤더 타이틀 사이즈 전환 (데모) */
+  body[data-title="p1"] { --fs-title: var(--fs-p1); }
+  body[data-title="p2"] { --fs-title: var(--fs-p2); }
+  body[data-title="p3"] { --fs-title: var(--fs-p3); }
+  body[data-title="p4"] { --fs-title: var(--fs-p4); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;               /* 1rem = 14px */
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+
+  /* ── dialog ──────────────────────────────────────────────────── */
+  .dialog {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: var(--dialog-w);        /* 고정 560px / 가변 29.1667vw */
+    max-height: min(var(--dialog-max-h), 100%);
+    overflow: hidden;
+    border-radius: 10px 10px 0 0;  /* 토큰 없음 → px */
+    background: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+  .dialog > .top { flex-shrink: 0; width: 100%; }
+
+  /* 브라우저 창 크롬 — 시안의 팝업 창 표현 : px */
+  .win-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 36px;
+    padding: 0 9px;
+    border: 1px solid #c2c2c2;
+    border-radius: 10px 10px 0 0;
+    background: #f6f6f4;
+  }
+  .win-bar .buttons { flex-shrink: 0; width: 52px; height: 12px; }
+  .win-bar .name {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    font-size: 14px;               /* 창 크롬 — 고정 */
+    line-height: 1.5;
+    color: #494949;
+    white-space: nowrap;
+  }
+  .win-url {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-12);
+    height: 32px;
+    padding: 5px 9px;
+    background: #edf2fa;
+  }
+  .win-url .graphic { flex-shrink: 0; width: 22px; height: 22px; }
+  .win-url .url {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;               /* 창 크롬 — 고정 */
+    line-height: 1.5;
+    color: #000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── header ──────────────────────────────────────────────────── */
+  .header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--mid-20) var(--mid-24) var(--mid-8);
+    background: #fff;
+  }
+  .header .title {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-title);    /* 기본 P2 = 16px @1920 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ── contentArea ─────────────────────────────────────────────── */
+  .body {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: var(--content-h);      /* 600px — 토큰 없음 → px */
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .body .content {
+    width: 100%;
+    padding: var(--mid-8) var(--mid-24) var(--mid-24);
+  }
+  .address-group { display: flex; flex-direction: column; width: 100%; }
+
+  .address-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-12);
+    width: 100%;
+    padding: var(--mid-20) 0 var(--mid-16);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .address-item:last-child { border-bottom: 0; }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 8px;              /* 토큰 없음 → px */
+    border: 1px solid var(--c-line);
+    font-size: var(--fs-c2);       /* 12px — 고정 */
+    line-height: 1.2;
+    text-align: center;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+
+  .address-item .text-area { display: flex; flex-direction: column; gap: var(--mid-16); width: 100%; }
+  .address-item .lines     { display: flex; flex-direction: column; gap: var(--mid-12); width: 100%; }
+  .address-item .head      { display: flex; flex-direction: column; gap: var(--mid-4); width: 100%; }
+
+  .address-item .addr {
+    width: 100%;
+    font-size: var(--fs-p3);       /* 14px = 1rem — 고정 */
+    line-height: 1.6;
+    color: var(--c-text);
+  }
+  .address-item .info {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    width: 100%;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+    color: var(--c-text);
+  }
+  .divider { flex-shrink: 0; width: 1px; height: 12px; background: var(--c-line); }
+
+  .address-item .request {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--mid-8);
+    width: 100%;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    line-height: 1.6;
+  }
+  .address-item .request .label { flex-shrink: 0; color: var(--c-sub); white-space: nowrap; }
+  .address-item .request .value { flex: 1 0 0; min-width: 0; color: var(--c-text); }
+
+  .item-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+  .item-actions .left { display: flex; align-items: center; gap: var(--mid-12); }
+  .btn-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 9px 0;                /* 토큰 없음 → px */
+    font-size: var(--fs-btn-s);    /* 12px — 고정 */
+    line-height: 1.2;
+    text-align: center;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  .btn-text.danger { color: var(--c-danger); }
+
+  .btn-select {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 9px 15px;             /* 토큰 없음 → px */
+    border: 1px solid var(--c-line-strong);
+    font-size: var(--fs-btn-s);    /* 12px — 고정 */
+    line-height: 1.2;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  .btn-select.is-selected {
+    border-color: transparent;
+    background: #111;
+    color: #fff;
+  }
+  .btn-select .check { position: relative; flex-shrink: 0; width: 14px; height: 14px; overflow: hidden; }
+  .btn-select .check img { position: absolute; inset: 35.08% 27.46%; width: auto; height: auto; max-width: none; }
+
+  /* ── buttonArea ──────────────────────────────────────────────── */
+  .button-area {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: var(--mid-12) var(--mid-24) var(--mid-24);
+    background: #fff;
+  }
+  .btn-add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    padding: 14px 22px;            /* 토큰 없음 → px */
+    border: 1px solid var(--c-line-strong);
+    font-weight: 500;
+    font-size: var(--fs-btn-l);    /* 13px — 고정 */
+    line-height: 1.2;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  .btn-add .plus { position: relative; flex-shrink: 0; width: 16px; height: 16px; overflow: hidden; }
+  .btn-add .plus img { position: absolute; inset: 25%; width: auto; height: auto; max-width: none; }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-readout { color: #999; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+
+  <div class="top">
+    <!-- 브라우저 창 크롬 — 시안의 팝업 창 표현 -->
+    <div class="win-bar">
+      <img class="buttons" src="assets/window-buttons.svg" alt="">
+      <span class="name">BRAND</span>
+    </div>
+    <div class="win-url">
+      <img class="graphic" src="assets/url-graphic.svg" alt="">
+      <span class="url">www.glit.at/lorem/ipsum?internal=true</span>
+    </div>
+
+    <div class="header">
+      <p class="title" id="dialogTitle">배송지 목록</p>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="content">
+      <div class="address-group">
+        <div class="address-item">
+          <span class="badge">기본 배송지</span>
+          <div class="text-area">
+            <div class="lines">
+              <div class="head">
+                <p class="addr">[12345] 서울 마포구 양화로 147 아일렉스 빌딩 413호</p>
+                <div class="info">
+                  <span>이강인</span>
+                  <span class="divider"></span>
+                  <span>010-1234-1234</span>
+                </div>
+              </div>
+              <div class="request">
+                <span class="label">배송 요청사항</span>
+                <span class="value">경비실에 맡겨주세요</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <div class="left">
+                <button type="button" class="btn-text">수정</button>
+                <span class="divider"></span>
+                <button type="button" class="btn-text danger">삭제</button>
+              </div>
+              <button type="button" class="btn-select is-selected"><span class="check"><img src="assets/check.svg" alt=""></span>선택됨</button>
+            </div>
+          </div>
+        </div>
+        <div class="address-item">
+          <div class="text-area">
+            <div class="lines">
+              <div class="head">
+                <p class="addr">[31493] 충남 아산시 배방읍 북수로 183 롯데캐슬아파트 105동 204호</p>
+                <div class="info">
+                  <span>이강인</span>
+                  <span class="divider"></span>
+                  <span>010-1234-1234</span>
+                </div>
+              </div>
+            </div>
+            <div class="item-actions">
+              <div class="left">
+                <button type="button" class="btn-text">수정</button>
+                <span class="divider"></span>
+                <button type="button" class="btn-text danger">삭제</button>
+              </div>
+              <button type="button" class="btn-select">선택</button>
+            </div>
+          </div>
+        </div>
+        <div class="address-item">
+          <div class="text-area">
+            <div class="lines">
+              <div class="head">
+                <p class="addr">[06120] 서울 강남구 봉은사로 125 리스트 강남(List Gangnam) B119호</p>
+                <div class="info">
+                  <span>이강인</span>
+                  <span class="divider"></span>
+                  <span>010-1234-1234</span>
+                </div>
+              </div>
+              <div class="request">
+                <span class="label">배송 요청사항</span>
+                <span class="value">경비실에 맡겨주세요</span>
+              </div>
+            </div>
+            <div class="item-actions">
+              <div class="left">
+                <button type="button" class="btn-text">수정</button>
+                <span class="divider"></span>
+                <button type="button" class="btn-text danger">삭제</button>
+              </div>
+              <button type="button" class="btn-select">선택</button>
+            </div>
+          </div>
+        </div>
+        <div class="address-item">
+          <div class="text-area">
+            <div class="lines">
+              <div class="head">
+                <p class="addr">[12345] 서울 마포구 양화로 147 아일렉스 빌딩 413호</p>
+                <div class="info">
+                  <span>이강인</span>
+                  <span class="divider"></span>
+                  <span>010-1234-1234</span>
+                </div>
+              </div>
+            </div>
+            <div class="item-actions">
+              <div class="left">
+                <button type="button" class="btn-text">수정</button>
+                <span class="divider"></span>
+                <button type="button" class="btn-text danger">삭제</button>
+              </div>
+              <button type="button" class="btn-select">선택</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="button-area">
+    <button type="button" class="btn-add">
+      <span class="plus"><img src="assets/plus.svg" alt=""></span>배송지 추가
+    </button>
+  </div>
+
+</div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <strong>title</strong>
+  <div class="demo-seg" id="titleToggle">
+    <button type="button" data-title-size="p1">P1</button>
+    <button type="button" data-title-size="p2">P2</button>
+    <button type="button" data-title-size="p3">P3</button>
+    <button type="button" data-title-size="p4">P4</button>
+  </div>
+  <span class="demo-readout" id="titleReadout">–</span>
+
+  <strong>box</strong>
+  <div class="demo-seg" id="boxToggle">
+    <button type="button" data-box="fixed-mid">560 + mid</button>
+    <button type="button" data-box="fixed-px">560 + px</button>
+    <button type="button" data-box="fluid-mid">vw + mid</button>
+  </div>
+  <span class="demo-readout" id="boxReadout">–</span>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const TITLE_KEY = 'fw-b-address-list-title-size';
+  const BOX_KEY   = 'fw-b-address-list-box';
+  const DESIGN = { p1: 18, p2: 16, p3: 14, p4: 13 };   /* @1920 기준 px */
+  const FIXED  = { p3: true, p4: true };               /* ≤ 1rem → 뷰포트와 무관하게 고정 */
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+
+  function setTitleSize(size) {
+    document.body.dataset.title = size;
+    $$('#titleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.titleSize === size));
+    store(TITLE_KEY, size);
+    readout();
+  }
+
+  function setBox(mode) {
+    document.body.dataset.box = mode;
+    $$('#boxToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.box === mode));
+    store(BOX_KEY, mode);
+    readout();
+  }
+
+  function readout() {
+    const size = document.body.dataset.title;
+    const fs = parseFloat(getComputedStyle($('.header .title')).fontSize);
+    $('#titleReadout').textContent =
+      `${DESIGN[size]}px @1920${FIXED[size] ? ' (고정)' : ''} · ${fs.toFixed(1)}px`;
+
+    const w = $('.dialog').getBoundingClientRect().width;
+    const pad = parseFloat(getComputedStyle($('.content')).paddingLeft);
+    const note = document.body.dataset.box === 'fluid-mid' ? ' (29.1667vw)' : '';
+    $('#boxReadout').textContent =
+      `${w.toFixed(1)}px${note} · pad ${pad.toFixed(1)}px · ${innerWidth}px`;
+  }
+
+  /* 배송지 선택 (데모 인터랙션) */
+  $('.address-group').addEventListener('click', e => {
+    const btn = e.target.closest('.btn-select');
+    if (!btn) return;
+    $$('.btn-select').forEach(b => {
+      b.classList.remove('is-selected');
+      b.textContent = '선택';
+    });
+    btn.classList.add('is-selected');
+    btn.innerHTML = '<span class="check"><img src="assets/check.svg" alt=""></span>선택됨';
+  });
+
+  $('#titleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-title-size]');
+    if (b) setTitleSize(b.dataset.titleSize);
+  });
+  $('#boxToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-box]');
+    if (b) setBox(b.dataset.box);
+  });
+  window.addEventListener('resize', readout);
+
+  setTitleSize(load(TITLE_KEY, 'p2'));
+  setBox(load(BOX_KEY, 'fixed-mid'));
+})();
+</script>
+
+</body>
+</html>
