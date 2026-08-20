@@ -881,9 +881,9 @@
     <input type="number" id="minValue" min="200" max="4000" step="1" value="360">
     <span>px</span>
   </div>
-  <div class="demo-limit is-off" id="maxControl">
-    <label><input type="checkbox" id="maxToggle"> max</label>
-    <input type="number" id="maxValue" min="200" max="4000" step="1" value="403" disabled>
+  <div class="demo-limit" id="maxControl">
+    <label><input type="checkbox" id="maxToggle" checked> max</label>
+    <input type="number" id="maxValue" min="200" max="4000" step="1" value="480">
     <span>px</span>
   </div>
   <p class="demo-readout" id="widthReadout">–</p>
@@ -1024,10 +1024,11 @@
   }
 
   /* ── 가로 너비 모드 · min/max 한계 (데모) ───────────────────── */
-  const WIDTH_KEY = 'fw-b-login-width-mode';
+  /* 기본값 = 제안안 (가변 + min 360 / max 480). 키에 -v2 를 붙여 이전 저장값을 무시한다 */
+  const WIDTH_KEY = 'fw-b-login-width-mode-v2';
   const LIMIT_KEYS = {
-    min: { on: 'fw-b-login-min-on',  val: 'fw-b-login-min-value',  def: '360', defOn: '1' },
-    max: { on: 'fw-b-login-max-on',  val: 'fw-b-login-max-value',  def: '403', defOn: '0' },
+    min: { on: 'fw-b-login-min-on-v2',  val: 'fw-b-login-min-value-v2',  def: '360', defOn: '1' },
+    max: { on: 'fw-b-login-max-on-v2',  val: 'fw-b-login-max-value-v2',  def: '480', defOn: '1' },
   };
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const load  = (k, d) => { try { return localStorage.getItem(k) ?? d; } catch (e) { return d; } };

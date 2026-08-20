@@ -20,8 +20,8 @@
         · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
         · px-*  : px 고정 — 이 화면에는 해당 없음
      3) 다이얼로그 box — 세 가지 안을 토글로 비교
-        · 560 + mid : 너비 560px 고정 + 내부 여백 mid-* (가변)   ← 기본
-        · 560 + px  : 너비 560px 고정 + 내부 여백 px 고정 (@1920 값)
+        · 560 + mid : 너비 560px 고정 + 내부 여백 mid-* (가변)
+        · 560 + px  : 너비 560px 고정 + 내부 여백 px 고정 (@1920 값)   ← 기본 (제안안)
         · vw + mid  : 너비 29.1667vw 가변 + 내부 여백 mid-* (가변)
           29.1667vw = 560 / 1920 → 1920 에서 560px
      4) 버튼 padding = em (해당 버튼의 label 사이즈 기준)
@@ -276,7 +276,7 @@ o 로그 기록
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const TITLE_KEY = 'fw-b-disclosure-desktop-title-size';
-  const BOX_KEY   = 'fw-b-disclosure-desktop-box';
+  const BOX_KEY   = 'fw-b-disclosure-desktop-box-v2';   /* 기본값 변경 — 이전 저장값 무시 */
   const DESIGN = { p1: 18, p2: 16, p3: 14, p4: 13 };   /* @1920 기준 px */
   const FIXED  = { p3: true, p4: true };               /* ≤ 1rem → 뷰포트와 무관하게 고정 */
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -320,7 +320,7 @@ o 로그 기록
   window.addEventListener('resize', readout);
 
   setTitleSize(load(TITLE_KEY, 'p2'));
-  setBox(load(BOX_KEY, 'fixed-mid'));
+  setBox(load(BOX_KEY, 'fixed-px'));   /* 제안안 = 560 + px */
 })();
 </script>
 

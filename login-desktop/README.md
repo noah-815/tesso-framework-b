@@ -127,8 +127,16 @@ body[data-width="fluid"] .card { max-width: var(--content-max); }
 px 값을 넣으면 즉시 반영됩니다 (허용 범위 200–4000px, 범위 밖 입력은 확정 시 보정).
 on/off 와 값 모두 localStorage 에 저장됩니다.
 
-기본값은 **min on 360px / max off** — 원래 명세 그대로입니다.
+기본값은 **가변 + min on 360px / max on 480px** (제안안) 입니다.
 한계가 실제로 걸린 순간 읽기값에 `(min)` / `(max)` 가 붙습니다.
+
+| viewport | 폭 | 걸린 한계 |
+|---|---|---|
+| 768 – 1713 | 360px | min |
+| 1920 | 403px | 없음 (시안값 그대로 통과) |
+| 2290 이상 | 480px | max |
+
+실제로 값이 움직이는 구간은 **1713 ~ 2290px** 입니다. 그 아래는 360, 위는 480 고정입니다.
 
 ```css
 body[data-width="fluid"] .card { max-width: var(--content-max); }
