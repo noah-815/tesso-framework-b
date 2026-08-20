@@ -9,6 +9,7 @@ Figma `-0_Current / 02_Framework B` 시안을 가변 규칙에 따라 구현한 
 |---|---|---|---|
 | [Search](search-mobile/) | Mobile ≤ 767 | `2294:13739` | [열기](https://noah-815.github.io/tesso-framework-b/search-mobile/) |
 | [Login · Sign Up · Change Password](login-desktop/) | Desktop ≥ 768 | `2348:64115` | [열기](https://noah-815.github.io/tesso-framework-b/login-desktop/) |
+| [Disclosure Dialog](disclosure-desktop/) | Desktop ≥ 768 | `2828:20428` | [열기](https://noah-815.github.io/tesso-framework-b/disclosure-desktop/) |
 | [Disclosure Dialog](disclosure-mobile/) | Mobile ≤ 767 | `2828:20429` | [열기](https://noah-815.github.io/tesso-framework-b/disclosure-mobile/) |
 
 각 폴더의 README 에 단위 체계, 뷰포트별 검증값, 시안과 다르게 처리한 부분이 정리되어 있습니다.

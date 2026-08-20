@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disclosure Dialog — Desktop (Framework B)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Unit system — desktop (viewport ≥ 768)
+     디자인 기준 폭: 1920
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value = rem (1rem = 14px), 0.0083 × screen width = 0.83vw
+        · size value ≤ 1rem(14px) 은 뷰포트와 무관하게 px 고정
+     2) Spacing
+        · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
+        · px-*  : px 고정 — 이 화면에는 해당 없음
+     3) 다이얼로그 box 가로 너비 = 560px 고정
+     4) 그 외 = px
+     5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --us: calc(100vw / 1920);       /* spacing 1px (mid-* 계산용) */
+
+    /* Typography ------------------------------------------------- */
+    --fs-p3:    14px;               /* paragraph-3        1rem     → 고정 */
+    --fs-btn-l: 13px;               /* button-label-large 0.929rem → 고정 */
+    --fs-p2:    calc((1.1429 - 1) * 0.83vw + 1rem);   /* paragraph-2 16px @1920 — 가변 */
+
+    /* Spacing — mid-* : (값 − 8) × 100vw / 1920 + 8 ---------------- */
+    --mid-8:  8px;                  /* 공식 결과도 8px (증감 없음) */
+    --mid-12: calc( 4 * var(--us) + 8px);
+    --mid-16: calc( 8 * var(--us) + 8px);
+    --mid-24: calc(16 * var(--us) + 8px);
+
+    /* 다이얼로그 box — 가로 고정 --------------------------------- */
+    --dialog-w: 560px;
+    --dialog-h: 746px;
+    --dialog-max-h: 800px;
+
+    /* Font / Color ----------------------------------------------- */
+    /* 영문 = Work Sans, 국문 = Pretendard.
+       Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백된다. */
+    --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
+    --c-text: #111;
+    --c-dim: rgba(0, 0, 0, 0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;               /* 1rem = 14px */
+  }
+  body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  .dim { position: absolute; inset: 0; z-index: 1; background: var(--c-dim); }
+
+  /* ── dialog ──────────────────────────────────────────────────── */
+  .dialog {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: var(--dialog-w);        /* 560px 고정 */
+    height: var(--dialog-h);       /* 746px */
+    max-height: min(var(--dialog-max-h), 100%);
+    overflow: hidden;
+    background: #fff;
+  }
+  .dialog .header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--mid-24) var(--mid-24) var(--mid-8);
+    background: #fff;
+    overflow: hidden;
+  }
+  .dialog .header .title {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p2);       /* 16px @1920 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+  }
+  .dialog .body {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .dialog .body .content {
+    width: 100%;
+    padding: var(--mid-16) var(--mid-24) var(--mid-24);
+  }
+  .dialog .body .content p {
+    font-size: var(--fs-p3);       /* 14px = 1rem — 고정 */
+    line-height: 1.6;
+    color: var(--c-text);
+    white-space: pre-wrap;
+  }
+  .dialog .body .content b { font-weight: 600; }
+  .dialog .button-area {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    padding: var(--mid-12) var(--mid-24) var(--mid-24);
+    background: #fff;
+  }
+  .dialog .button-area .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    padding: 14px 22px;            /* 토큰 없음 → px */
+    border: 1px solid transparent;
+    background: #111;
+    font-weight: 500;
+    font-size: var(--fs-btn-l);    /* 13px — 고정 */
+    line-height: 1.2;
+    text-align: center;
+    color: #fff;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="dim"></div>
+
+<div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+  <div class="header">
+    <p class="title" id="dialogTitle">개인정보 수집/이용 및 처리 동의 (필수)</p>
+  </div>
+
+  <div class="body">
+    <div class="content">
+      <p><b>1. 개인정보 수집목적 및 이용목적</b>
+상품 주문, 결제 및 배송
+
+<b>2. 수집하는 개인정보 항목</b>
+주문 시 입력받는 항목 기재 (예시 : [필수] 이름, 주소, 이메일, 휴대전화)
+
+<b>3. 개인정보의 보유기간 및 이용기간</b>
+원칙적으로, 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다. 단, 다음의 정보에 대해서는 아래의 이유로 명시한 기간 동안 보존합니다.
+가. 회사 내부 방침에 의한 정보 보유 사유
+o 부정거래 방지 및 쇼핑몰 운영방침에 따른 보관 : 5년
+나. 관련 법령에 의한 정보보유 사유
+o 계약 또는 청약철회 등에 관한 기록
+-보존이유 : 전자상거래등에서의소비자보호에관한법률
+-보존기간 : 5년
+o 대금 결제 및 재화 등의 공급에 관한 기록
+-보존이유: 전자상거래등에서의소비자보호에관한법률
+-보존기간 : 5년
+o 소비자 불만 또는 분쟁처리에 관한 기록
+-보존이유 : 전자상거래등에서의소비자보호에관한법률
+-보존기간 : 3년
+o 로그 기록
+-보존이유: 통신비밀보호법
+-보존기간 : 3개월
+
+※ 동의를 거부할 수 있으나 거부시 구매 서비스 이용이 불가능합니다.</p>
+    </div>
+  </div>
+
+  <div class="button-area">
+    <button type="button" class="btn">확인</button>
+  </div>
+</div>
+
+</body>
+</html>
