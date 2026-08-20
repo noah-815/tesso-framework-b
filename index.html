@@ -2,606 +2,150 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Search — Mobile Responsive (Framework B)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tesso — Framework B</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
-  /* ─────────────────────────────────────────────────────────────
-     Unit system — mobile (viewport ≤ 767)
-     디자인 기준 폭: 390 (시안 프레임 393)
-
-     1) Typography
-        font-size = size value × screen width / 390
-        · size value = rem (1rem = 14px)
-        · 450px 이후 고정  → --tw: min(100vw, 450px)
-        · "size value ≤ 1rem 은 고정" 예외는 모바일에서 적용하지 않음 → 전부 가변
-        ※ statusBar 시간(17px) / BRAND 로고(20px) 만 가변 로직 제외 → px 고정
-     2) Spacing (mid-* 토큰)
-        (값 − 8) × 100vw / 390 + 8
-        · 값 < 8 인 토큰은 공식 제외 — 값 그대로 px 고정
-     3) em 적용
-        · search — 상하 padding / text↔total gap / 아이콘 크기 (@base p4 = 13px)
-        · badge  — padding (@base c2 = 12px)
-     4) 그 외 = px
-     5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
-     ───────────────────────────────────────────────────────────── */
   :root {
-    /* 기준 단위 -------------------------------------------------- */
-    --tw: min(100vw, 450px);        /* 타이포 기준 폭 (450px 이후 고정) */
-    --ut: calc(var(--tw) / 390);    /* 타이포 1px */
-    --us: calc(100vw / 390);        /* spacing 1px (mid-* 계산용) */
-    /* ↑ mid-* 는 명세대로 450px 고정 없이 100vw 로 계속 증가한다.
-       타이포와 동일하게 450px 에서 멈추려면 아래 한 줄로 교체:
-       --us: calc(var(--tw) / 390);                                   */
-
-    /* Typography — 전부 가변 (450px 이후 고정) --------------------- */
-    --fs-c2: calc(12 * var(--ut));  /* caption-2   12px @390 */
-    --fs-c1: calc(13 * var(--ut));  /* caption-1   13px @390 */
-    --fs-p4: calc(13 * var(--ut));  /* paragraph-4 13px @390 */
-    --fs-p3: calc(14 * var(--ut));  /* paragraph-3 14px @390 */
-    /* 가변 로직 제외 → px 고정 */
-    --fs-logo: 20px;                /* BRAND 로고     — 고정 */
-    --fs-status: 17px;              /* statusBar 시간 — 고정 */
-
-    /* Spacing — mid-* : (값 − 8) × 100vw / 390 + 8 ---------------- */
-    /* 값 < 8 → 공식 제외, 값 그대로 고정 */
-    --mid-2:  2px;
-    --mid-4:  4px;
-    --mid-6:  6px;
-    --mid-8:  8px;                  /* 공식 결과도 8px (증감 없음) */
-    /* 값 > 8 → 가변 */
-    --mid-12: calc( 4 * var(--us) + 8px);
-    --mid-16: calc( 8 * var(--us) + 8px);
-    --mid-24: calc(16 * var(--us) + 8px);
-    --mid-32: calc(24 * var(--us) + 8px);
-    --mid-40: calc(32 * var(--us) + 8px);
-
-    /* Font / Color ----------------------------------------------- */
-    /* 영문 = Work Sans, 국문 = Pretendard.
-       Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백된다.
-       "와일드 베리 300ml" 처럼 섞인 문자열도 문자 단위로 갈린다. */
     --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
     --c-text: #111;
-    --c-header-text: #372320;
+    --c-sub: #6a6a6a;
     --c-line: rgba(0, 0, 0, 0.1);
-    --c-line-strong: rgba(0, 0, 0, 0.12);
-    --c-header-bg: #fff;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html {
-    -webkit-text-size-adjust: 100%;
-    font-size: 14px;               /* 1rem = 14px */
-    overflow-x: hidden;            /* 100vw 기반 계산 시 가로 스크롤 방지 */
-  }
+  html { font-size: 14px; -webkit-text-size-adjust: 100%; }
   body {
     font-family: var(--font);
     color: var(--c-text);
     background: #fff;
+    line-height: 1.6;
     word-break: keep-all;
-    overflow-x: hidden;
-    padding-bottom: 60px;          /* browser bar 영역 */
+    -webkit-font-smoothing: antialiased;
   }
-  img { display: block; }
-  ul, ol, li { list-style: none; }
-  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 80px 20px 120px; }
 
-  /* ── top : statusBar + header (sticky) ───────────────────────── */
-  .top {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: var(--c-header-bg);
-  }
-
-  /* statusBar — 디바이스 목업 (실서비스에서는 제거) : 전부 px */
-  .status-bar {
-    position: relative;
-    height: 54px;
-    background: var(--c-header-bg);
-  }
-  .status-bar .time {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 138px;
-    height: 54px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: var(--fs-status);   /* 17px — 고정 */
-    line-height: 22px;
-    color: #000;
-  }
-  .status-bar .levels {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 140.5px;
-    height: 54px;
-  }
-
-  /* mobileH_header — 60px, padding 16px : px */
-  .mobile-header {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    padding: 0 16px;
-    background: #fff;
-  }
-  .mobile-header .util {
-    display: flex;
-    align-items: center;
-    height: 48px;
-    min-width: 48px;
-    font-size: var(--fs-c1);       /* 13px @390 — 가변 */
-    line-height: normal;
+  header { padding-bottom: 40px; border-bottom: 1px solid var(--c-line); }
+  header .eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--c-header-text);
+    color: var(--c-sub);
+  }
+  header h1 { margin-top: 10px; font-size: 26px; font-weight: 600; line-height: 1.4; }
+  header p { margin-top: 12px; font-size: 14px; color: var(--c-sub); }
+
+  .list { display: flex; flex-direction: column; }
+  .item {
+    display: block;
+    padding: 32px 0;
+    border-bottom: 1px solid var(--c-line);
+    color: inherit;
     text-decoration: none;
   }
-  .mobile-header .util.bag { justify-content: flex-end; text-align: right; }
-  .mobile-header .logo {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-weight: 600;
-    font-size: var(--fs-logo);     /* 20px — 고정 */
-    line-height: 1.4;
-    letter-spacing: 0;
-    color: var(--c-header-text);
+  .item:hover h2 { text-decoration: underline; text-underline-offset: 3px; }
+  .item .row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+  .item h2 { font-size: 18px; font-weight: 600; }
+  .item .tag {
+    padding: 2px 8px;
+    border: 1px solid var(--c-line);
+    border-radius: 999px;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    color: var(--c-sub);
     white-space: nowrap;
   }
-
-  /* ── searchArea ──────────────────────────────────────────────── */
-  .search-area {
-    display: flex;
-    align-items: center;
-    padding: var(--mid-24) 16px;   /* 세로 mid-24 / 가로 16px */
-    background: #fff;
+  .item p { margin-top: 8px; font-size: 14px; color: var(--c-sub); }
+  .item dl {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    gap: 4px 16px;
+    margin-top: 16px;
+    font-size: 12px;
   }
-
-  /* search : 상하 padding · text↔total gap · 아이콘 = em (@p4 13px) */
-  .search {
-    flex: 1 0 0;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    font-size: var(--fs-p4);       /* em base = 13px @390 — 가변 */
-    gap: 1em;                      /* 13px : text ↔ total */
-    padding-top: 1em;              /* 13px */
-    padding-bottom: 1.0769em;      /* 14px */
-    border-bottom: 1px solid var(--c-line-strong);
-  }
-  .search-input {
-    flex: 1 0 0;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--mid-4);
-    overflow: hidden;
-  }
-  .search-icon {                   /* searchEdge 21px = 1.6154em */
-    position: relative;
-    flex-shrink: 0;
-    width: 1.6154em;
-    height: 1.6154em;
-    overflow: hidden;
-  }
-  .search-icon img {
-    position: absolute;
-    inset: 24.29% 38.48% 24.89% 12.87%;   /* leaf 10.216 × 10.672 @21px */
-    width: auto;
-    height: auto;
-    max-width: none;
-  }
-  .search-keyword {
-    display: flex;
-    align-items: center;
-    gap: var(--mid-2);
-    min-width: 0;
-  }
-  .search-keyword p {
-    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
-    line-height: 1.6;
-    color: var(--c-text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .search-total {
-    flex-shrink: 0;
-    display: flex;
-    align-items: flex-start;
-    gap: var(--mid-6);
-    font-size: var(--fs-c1);       /* 13px @390 — 가변 */
-    line-height: 1.2;
-    text-align: right;
-    white-space: nowrap;
+  .item dt { color: var(--c-sub); }
+  .item dd { color: var(--c-text); }
+  .item code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px;
     color: var(--c-text);
   }
 
-  /* ── content ─────────────────────────────────────────────────── */
-  .content {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-bottom: var(--mid-40);
-    background: #fff;
-  }
-  .product-group {
-    width: 100%;
-    border-bottom: 1px solid var(--c-line);
-    overflow: hidden;
-  }
-  .row {
-    display: flex;
-    align-items: stretch;
-    width: 100%;
-  }
-  .card {
-    position: relative;
-    flex: 1 0 0;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    overflow: hidden;
-  }
-  .card + .card { border-left: 0; }
-  .row .card:first-child { border-right: 1px solid var(--c-line); }
+  footer { margin-top: 48px; font-size: 12px; color: var(--c-sub); }
+  footer a { color: inherit; }
 
-  .card .thumb {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-  }
-  .card .thumb img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    pointer-events: none;
-  }
-  /* badge : 토큰 없음 → px */
-  .card .badge {
-    position: absolute;
-    left: 12px;
-    top: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.6667em 0.8333em;    /* 8px / 10px @ c2 12px — em */
-    background: #111;
-    font-size: var(--fs-c2);       /* 12px @390 — 가변 · em base */
-    line-height: 1.2;
-    color: #fff;
-    white-space: nowrap;
-  }
-  .card .info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--mid-2);
-    width: 100%;
-    flex: 1 1 auto;                /* 이름 길이가 달라도 카드 하단선 정렬 */
-    padding: var(--mid-16) var(--mid-12);
-    border-bottom: 1px solid var(--c-line);
-  }
-  .product-group .row:last-child .info { border-bottom: 0; }
-  .card .name {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    width: 100%;
-    min-height: 3.2em;             /* Max 2line 슬롯 확보 → 행 내 가격 라인 정렬 */
-    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
-    line-height: 1.6;
-    color: var(--c-text);
-    text-overflow: ellipsis;
-  }
-  .card .price {
-    display: flex;
-    align-items: baseline;
-    gap: var(--mid-4);
-  }
-  .card .price .now {
-    display: inline-flex;
-    align-items: center;
-    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
-    line-height: 1.6;
-    color: var(--c-text);
-    white-space: nowrap;
-  }
-  .card .price .was {
-    position: relative;
-    display: inline-flex;
-    align-items: baseline;
-    justify-content: center;
-    font-size: var(--fs-c2);       /* 12px @390 — 가변 */
-    line-height: 1.2;
-    color: var(--c-text);
-    opacity: 0.5;
-    white-space: nowrap;
-  }
-  .card .price .was::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    height: 1px;
-    background: #111;
-    transform: translateY(-50%);
-  }
-
-  /* ── pagination ──────────────────────────────────────────────── */
-  .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: var(--mid-32) var(--mid-8);
-    overflow: hidden;
-  }
-  .pagination .inner {
-    display: flex;
-    align-items: center;
-    gap: var(--mid-8);
-  }
-  .pagination .icon-btn {          /* 토큰 없음 → px */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    flex-shrink: 0;
-  }
-  .pagination .icon-btn[disabled] { opacity: 0.3; cursor: default; }
-  .pagination .icon-btn .glyph {
-    position: relative;
-    width: 24px;
-    height: 24px;
-    overflow: hidden;
-  }
-  .pagination .icon-btn .glyph img {
-    position: absolute;
-    inset: 29.36% 38.21%;          /* leaf 5.66 × 9.907 @24px */
-    width: auto;
-    height: auto;
-    max-width: none;
-    transform: scaleY(-1);
-  }
-  .pagination .page-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 4px;
-    font-size: var(--fs-p3);       /* 14px @390 — 가변 */
-    line-height: 1.6;
-    text-align: center;
-    color: #1d1d1d;
-    white-space: nowrap;
-  }
-
-  /* ── browser bar — 디바이스 목업 (실서비스에서는 제거) : px ────── */
-  .browser-bar {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 100;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 14px 10px;
-    pointer-events: none;
-  }
-  .browser-bar .pill {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 32px;
-    padding: 9px 18px;
-    border: 1px solid #fff;
-    border-radius: 24px;
-    background: rgba(250, 250, 250, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 40px 0 rgba(0, 0, 0, 0.1);
-    font-weight: 500;
-    font-size: 12px;               /* 디바이스 목업 — 고정 */
-    letter-spacing: 0.12px;
-    color: #000;
-    white-space: nowrap;
+  @media (max-width: 560px) {
+    .wrap { padding: 48px 20px 80px; }
+    header h1 { font-size: 22px; }
+    .item dl { grid-template-columns: 1fr; gap: 2px; }
+    .item dt { margin-top: 8px; }
   }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="top">
-  <!-- statusBar : 디바이스 목업 -->
-  <div class="status-bar">
-    <div class="time">9:41</div>
-    <img class="levels" src="assets/status-levels.svg" alt="">
-  </div>
-
-  <header class="mobile-header">
-    <a class="util menu" href="#">Menu</a>
-    <div class="logo">BRAND</div>
-    <a class="util bag" href="#">Bag [0]</a>
+  <header>
+    <p class="eyebrow">Tesso Storefront</p>
+    <h1>Framework B — 반응형 구현</h1>
+    <p>Figma 시안을 가변 규칙(타이포·spacing·width)에 따라 구현한 화면 모음입니다.
+       각 화면의 단위 체계와 검증값은 폴더별 README 에 정리되어 있습니다.</p>
   </header>
-</div>
 
-<div class="search-area">
-  <div class="search">
-    <div class="search-input">
-      <span class="search-icon"><img src="assets/search.svg" alt=""></span>
-      <div class="search-keyword"><p>Moisturising</p></div>
-    </div>
-    <div class="search-total">
-      <span class="label">검색 결과</span>
-      <span class="count">999</span>
-    </div>
-  </div>
-</div>
+  <div class="list">
 
-<main class="content">
-  <div class="product-group">
-    <div class="row">
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Glow Moisturising Cream 50ml"></div>
-        <span class="badge">SOLD OUT</span>
-        <div class="info">
-          <p class="name">Glow Moisturising Cream 50ml</p>
-          <div class="price">
-            <span class="now"><span class="num">38,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">52,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="펩타이드 리뉴얼 세럼"></div>
-        <div class="info">
-          <p class="name">펩타이드 리뉴얼 세럼</p>
-          <div class="price">
-            <span class="now"><span class="num">128,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-    </div>
-    <div class="row">
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="와일드 베리 핸드 로션 300ml 대용량 리필 기획세트"></div>
-        <div class="info">
-          <p class="name">와일드 베리 핸드 로션 300ml 대용량 리필 기획세트</p>
-          <div class="price">
-            <span class="now"><span class="num">19,200</span><span class="won">원</span></span>
-            <span class="was"><span class="num">24,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Sea Salt Body Scrub"></div>
-        <div class="info">
-          <p class="name">Sea Salt Body Scrub</p>
-          <div class="price">
-            <span class="now"><span class="num">42,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-    </div>
-    <div class="row">
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Peptides Renewal Serum Concentrate Advanced Formula"></div>
-        <div class="info">
-          <p class="name">Peptides Renewal Serum Concentrate Advanced Formula</p>
-          <div class="price">
-            <span class="now"><span class="num">96,000</span><span class="won">원</span></span>
-            <span class="was"><span class="num">128,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Bergamot & Patchouli Eau de Parfum 100ml"></div>
-        <div class="info">
-          <p class="name">Bergamot & Patchouli Eau de Parfum 100ml</p>
-          <div class="price">
-            <span class="now"><span class="num">186,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-    </div>
-    <div class="row">
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="글로우 모이스처라이징 크림"></div>
-        <div class="info">
-          <p class="name">글로우 모이스처라이징 크림</p>
-          <div class="price">
-            <span class="now"><span class="num">52,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="베르가못 앤 파출리 오 드 퍼퓸 100ml"></div>
-        <div class="info">
-          <p class="name">베르가못 앤 파출리 오 드 퍼퓸 100ml</p>
-          <div class="price">
-            <span class="now"><span class="num">148,800</span><span class="won">원</span></span>
-            <span class="was"><span class="num">186,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-    </div>
-    <div class="row">
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Nourishing Lip Balm Duo"></div>
-        <div class="info">
-          <p class="name">Nourishing Lip Balm Duo</p>
-          <div class="price">
-            <span class="now"><span class="num">18,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="너리싱 립밤 듀오 기획세트 2종"></div>
-        <div class="info">
-          <p class="name">너리싱 립밤 듀오 기획세트 2종</p>
-          <div class="price">
-            <span class="now"><span class="num">14,400</span><span class="won">원</span></span>
-            <span class="was"><span class="num">18,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-    </div>
-    <div class="row">
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="시 솔트 바디 스크럽 350ml"></div>
-        <div class="info">
-          <p class="name">시 솔트 바디 스크럽 350ml</p>
-          <div class="price">
-            <span class="now"><span class="num">42,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-      <article class="card">
-        <div class="thumb"><img src="assets/thumbnail.png" alt="Wild Berry Hand Lotion Refill 300ml Limited Edition Set"></div>
-        <div class="info">
-          <p class="name">Wild Berry Hand Lotion Refill 300ml Limited Edition Set</p>
-          <div class="price">
-            <span class="now"><span class="num">33,600</span><span class="won">원</span></span>
-            <span class="was"><span class="num">42,000</span><span class="won">원</span></span>
-          </div>
-        </div>
-      </article>
-    </div>
-  </div>
-
-  <nav class="pagination">
-    <div class="inner">
-      <button class="icon-btn" type="button" aria-label="이전 페이지" disabled>
-        <span class="glyph"><img src="assets/chevron-left.svg" alt=""></span>
-      </button>
-      <div class="page-group">
-        <span>1</span><span>/</span><span>10</span>
+    <a class="item" href="search-mobile/">
+      <div class="row">
+        <h2>Search</h2>
+        <span class="tag">Mobile ≤ 767</span>
       </div>
-      <button class="icon-btn" type="button" aria-label="다음 페이지">
-        <span class="glyph"><img src="assets/chevron-right.svg" alt=""></span>
-      </button>
-    </div>
-  </nav>
-</main>
+      <p>검색 결과 화면 — 2열 상품 그리드, 검색 바, 페이지네이션.</p>
+      <dl>
+        <dt>타이포</dt><dd>size value × 100vw / 390, 450px 이후 고정 (전부 가변)</dd>
+        <dt>spacing</dt><dd><code>mid-*</code> = (값 − 8) × 100vw / 390 + 8, 값 &lt; 8 은 고정</dd>
+        <dt>em</dt><dd>search 상하 padding · gap · 아이콘 / badge padding</dd>
+        <dt>Figma</dt><dd><code>2294:13739</code></dd>
+      </dl>
+    </a>
 
-<!-- browser bar : 디바이스 목업 -->
-<div class="browser-bar"><div class="pill">tesso.io</div></div>
+    <a class="item" href="login-desktop/">
+      <div class="row">
+        <h2>Login · Sign Up · Change Password</h2>
+        <span class="tag">Desktop ≥ 768</span>
+      </div>
+      <p>로그인부터 회원가입 4단계, 비밀번호 변경 3단계까지 이어지는 9개 화면 플로우.
+         dialog · snackbar 포함, 우하단 패널에서 width 안(가변 / 고정 400 / max 상한)을 비교할 수 있습니다.</p>
+      <dl>
+        <dt>타이포</dt><dd>(size value − 1) × 0.83vw + 1rem, ≤ 1rem 은 고정</dd>
+        <dt>spacing</dt><dd><code>mid-*</code> = (값 − 8) × 100vw / 1920 + 8 · <code>px-*</code> 는 고정</dd>
+        <dt>width</dt><dd>(2.5 × 컬럼) + (3 × 거터), min 360px — 12컬럼 / 거터 16 / 마진 20</dd>
+        <dt>Figma</dt><dd><code>2348:64115</code></dd>
+      </dl>
+    </a>
 
+    <a class="item" href="disclosure-mobile/">
+      <div class="row">
+        <h2>Disclosure Dialog</h2>
+        <span class="tag">Mobile ≤ 767</span>
+      </div>
+      <p>개인정보 수집/이용 및 처리 동의 모달 — 고정 헤더, 스크롤 본문, 하단 확인 버튼.</p>
+      <dl>
+        <dt>타이포</dt><dd>size value × 100vw / 390, 450px 이후 고정 (전부 가변)</dd>
+        <dt>spacing</dt><dd><code>mid-20</code> 가변 + 헤더 상단만 <code>px-20</code> 고정</dd>
+        <dt>Figma</dt><dd><code>2828:20429</code></dd>
+      </dl>
+    </a>
+
+  </div>
+
+  <footer>
+    폰트는 세 화면 모두 <code>"Work Sans", "Pretendard Variable", Pretendard</code> 단일 스택으로,
+    영문은 Work Sans · 국문은 Pretendard 로 문자 단위 분기됩니다.
+    <br>
+    <a href="https://github.com/noah-815/tesso-framework-b">github.com/noah-815/tesso-framework-b</a>
+  </footer>
+
+</div>
 </body>
 </html>

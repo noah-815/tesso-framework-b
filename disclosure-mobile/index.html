@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Disclosure Dialog — Mobile Responsive (Framework B)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Unit system — mobile (viewport ≤ 767)
+     디자인 기준 폭: 390 (시안 프레임 393)
+
+     1) Typography
+        font-size = size value × screen width / 390
+        · size value = rem (1rem = 14px)
+        · 450px 이후 고정  → --tw: min(100vw, 450px)
+        · "size value ≤ 1rem 은 고정" 예외는 모바일에서 적용하지 않음 → 전부 가변
+        ※ statusBar 시간(17px) 등 디바이스 목업만 가변 로직 제외 → px 고정
+     2) Spacing
+        · mid-* : (값 − 8) × 100vw / 390 + 8, 값 < 8 이면 값 그대로 고정
+        · px-*  : px 고정 — 이 화면에는 해당 없음
+          (시안의 헤더 상단 padding px-20 은 mid-20 으로 변경 적용)
+     3) 그 외 = px
+     4) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --tw: min(100vw, 450px);        /* 타이포 기준 폭 (450px 이후 고정) */
+    --ut: calc(var(--tw) / 390);    /* 타이포 1px */
+    --us: calc(100vw / 390);        /* spacing 1px (mid-* 계산용) */
+    /* ↑ mid-* 는 명세대로 450px 고정 없이 100vw 로 계속 증가한다.
+       타이포와 동일하게 450px 에서 멈추려면 아래 한 줄로 교체:
+       --us: calc(var(--tw) / 390);                                   */
+
+    /* Typography — 전부 가변 (450px 이후 고정) --------------------- */
+    --fs-p3:    calc(14 * var(--ut));   /* paragraph-3        14px @390 */
+    --fs-p2:    calc(16 * var(--ut));   /* paragraph-2        16px @390 */
+    --fs-btn-l: calc(13 * var(--ut));   /* button-label-large 13px @390 */
+
+    /* Spacing ---------------------------------------------------- */
+    /* mid-* : (값 − 8) × 100vw / 390 + 8 · 값 < 8 → 값 그대로 고정 */
+    --mid-8:  8px;                  /* 공식 결과도 8px (증감 없음) */
+    --mid-20: calc(12 * var(--us) + 8px);
+
+    /* Font / Color ----------------------------------------------- */
+    /* 영문 = Work Sans, 국문 = Pretendard.
+       Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백된다. */
+    --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
+    --c-text: #111;
+    --c-dim: rgba(0, 0, 0, 0.5);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;               /* 1rem = 14px */
+    overflow: hidden;
+  }
+  body {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+    overflow: hidden;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+
+  /* ── statusBar — 디바이스 목업 (실서비스에서는 제거) : px ─────── */
+  .status-bar {
+    position: relative;
+    flex-shrink: 0;
+    height: 54px;
+    background: #fff;
+  }
+  .status-bar .time {
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 138px;
+    height: 54px;
+    font-weight: 600;
+    font-size: 17px;               /* 디바이스 목업 — 고정 */
+    line-height: 22px;
+    color: #000;
+  }
+  .status-bar .levels { position: absolute; right: 0; top: 0; width: 140.5px; height: 54px; }
+
+  /* ── contentArea + dim ───────────────────────────────────────── */
+  .content-area {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+  .content-area .dim { position: absolute; inset: 0; background: var(--c-dim); }
+
+  /* ── dialog ──────────────────────────────────────────────────── */
+  .dialog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 시안: 393 프레임에 353 (좌우 20px). 좁은 폭에서 넘치지 않도록 상한으로 처리 */
+    width: min(353px, calc(100% - 40px));
+    height: 480px;                 /* 토큰 없음 → px */
+    max-height: 100%;
+    overflow: hidden;
+    background: #fff;
+  }
+  .dialog .header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: var(--mid-20) var(--mid-20) var(--mid-8);
+    background: #fff;
+    overflow: hidden;
+  }
+  .dialog .header .title {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p2);       /* 16px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+  }
+  .dialog .body {
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .dialog .body .content {
+    width: 100%;
+    padding: var(--mid-8) var(--mid-20) var(--mid-20);
+  }
+  .dialog .body .content p {
+    font-size: var(--fs-p3);       /* 14px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+    white-space: pre-wrap;
+  }
+  .dialog .body .content b { font-weight: 600; }
+  .dialog .button-area {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: var(--mid-8) var(--mid-20) var(--mid-20);
+  }
+  .dialog .button-area .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    height: 44px;                  /* 토큰 없음 → px */
+    padding: 14px 22px;
+    border: 1px solid transparent;
+    background: #111;
+    font-weight: 500;
+    font-size: var(--fs-btn-l);    /* 13px @390 — 가변 */
+    line-height: 1.2;
+    text-align: center;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  /* ── browser — 디바이스 목업 (실서비스에서는 제거) : px ───────── */
+  .browser {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px 10px 30px;
+    background: #fff;
+  }
+  .browser .tabs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 100%;
+  }
+  .browser .pill {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border: 1px solid #fff;
+    border-radius: 24px;
+    background: rgba(250, 250, 250, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 40px rgba(0, 0, 0, 0.1);
+    font-size: 23px;
+    line-height: 1;
+    color: #111;
+  }
+  .browser .search-bar {
+    position: relative;
+    flex-shrink: 1;
+    width: 218px;
+    min-width: 0;
+    height: 48px;
+    border: 1px solid #fff;
+    border-radius: 24px;
+    background: rgba(250, 250, 250, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 42px rgba(0, 0, 0, 0.1);
+  }
+  .browser .search-bar .url {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 500;
+    font-size: 16px;               /* 디바이스 목업 — 고정 */
+    color: #111;
+    white-space: nowrap;
+  }
+  .browser .search-bar .site-settings {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 15px;
+    height: 18px;
+  }
+  .browser .search-bar .reload {
+    position: absolute;
+    right: 12.24px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14.757px;
+    height: 17.982px;
+  }
+</style>
+</head>
+<body>
+
+<!-- statusBar : 디바이스 목업 -->
+<div class="status-bar">
+  <div class="time">9:41</div>
+  <img class="levels" src="assets/status-levels.svg" alt="">
+</div>
+
+<div class="content-area">
+  <div class="dim"></div>
+
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle">
+    <div class="header">
+      <p class="title" id="dialogTitle">개인정보 수집/이용 및 처리 동의 (필수)</p>
+    </div>
+
+    <div class="body">
+      <div class="content">
+        <p><b>1. 개인정보 수집목적 및 이용목적</b>
+상품 주문, 결제 및 배송
+
+<b>2. 수집하는 개인정보 항목</b>
+주문 시 입력받는 항목 기재 (예시 : [필수] 이름, 주소, 이메일, 휴대전화)
+
+<b>3. 개인정보의 보유기간 및 이용기간</b>
+원칙적으로, 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를 지체 없이 파기합니다. 단, 다음의 정보에 대해서는 아래의 이유로 명시한 기간 동안 보존합니다.
+가. 회사 내부 방침에 의한 정보 보유 사유
+o 부정거래 방지 및 쇼핑몰 운영방침에 따른 보관 : 5년
+나. 관련 법령에 의한 정보보유 사유
+o 계약 또는 청약철회 등에 관한 기록
+-보존이유 : 전자상거래등에서의소비자보호에관한법률
+-보존기간 : 5년
+o 대금 결제 및 재화 등의 공급에 관한 기록
+-보존이유: 전자상거래등에서의소비자보호에관한법률
+-보존기간 : 5년
+o 소비자 불만 또는 분쟁처리에 관한 기록
+-보존이유 : 전자상거래등에서의소비자보호에관한법률
+-보존기간 : 3년
+o 로그 기록
+-보존이유: 통신비밀보호법
+-보존기간 : 3개월
+
+※ 동의를 거부할 수 있으나 거부시 구매 서비스 이용이 불가능합니다.</p>
+      </div>
+    </div>
+
+    <div class="button-area">
+      <button type="button" class="btn">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- browser : 디바이스 목업 -->
+<div class="browser">
+  <div class="tabs">
+    <div class="pill" aria-hidden="true">‹</div>
+    <div class="search-bar">
+      <img class="site-settings" src="assets/site-settings.svg" alt="">
+      <span class="url">tesso.io</span>
+      <img class="reload" src="assets/reload.svg" alt="">
+    </div>
+    <div class="pill" aria-hidden="true">···</div>
+  </div>
+</div>
+
+</body>
+</html>
