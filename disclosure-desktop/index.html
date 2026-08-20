@@ -19,9 +19,11 @@
      2) Spacing
         · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
         · px-*  : px 고정 — 이 화면에는 해당 없음
-     3) 다이얼로그 box 가로 너비 — 두 가지 안을 토글로 비교
-        · 고정 : 560px
-        · 가변 : 560 / 1920 = 29.1667vw  (1920 에서 560px)
+     3) 다이얼로그 box — 세 가지 안을 토글로 비교
+        · 560 + mid : 너비 560px 고정 + 내부 여백 mid-* (가변)   ← 기본
+        · 560 + px  : 너비 560px 고정 + 내부 여백 px 고정 (@1920 값)
+        · vw + mid  : 너비 29.1667vw 가변 + 내부 여백 mid-* (가변)
+          29.1667vw = 560 / 1920 → 1920 에서 560px
      4) 그 외 = px
      5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
      ※ 헤더 타이틀은 우하단 데모 패널에서 P1~P4 로 바꿔 볼 수 있다 (기본 = 시안값 P2).
@@ -62,8 +64,14 @@
     --c-dim: rgba(0, 0, 0, 0.5);
   }
 
-  /* 다이얼로그 가로 너비 전환 (데모) */
-  body[data-dialog-width="fluid"] { --dialog-w: var(--dialog-w-fluid); }
+  /* 다이얼로그 box 안 전환 (데모) — --dialog-w 와 mid-* 만 덮어쓴다 */
+  body[data-box="fixed-px"] {         /* 내부 여백을 @1920 값으로 고정 */
+    --mid-8:  8px;
+    --mid-12: 12px;
+    --mid-16: 16px;
+    --mid-24: 24px;
+  }
+  body[data-box="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
 
   /* 헤더 타이틀 사이즈 전환 (데모) */
   body[data-title="p1"] { --fs-title: var(--fs-p1); }
@@ -253,12 +261,13 @@ o 로그 기록
   </div>
   <span class="demo-readout" id="titleReadout">–</span>
 
-  <strong>width</strong>
-  <div class="demo-seg" id="widthToggle">
-    <button type="button" data-dialog-width="fixed">고정 560</button>
-    <button type="button" data-dialog-width="fluid">가변 vw</button>
+  <strong>box</strong>
+  <div class="demo-seg" id="boxToggle">
+    <button type="button" data-box="fixed-mid">560 + mid</button>
+    <button type="button" data-box="fixed-px">560 + px</button>
+    <button type="button" data-box="fluid-mid">vw + mid</button>
   </div>
-  <span class="demo-readout" id="widthReadout">–</span>
+  <span class="demo-readout" id="boxReadout">–</span>
 </nav>
 
 <script>
@@ -266,7 +275,7 @@ o 로그 기록
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const TITLE_KEY = 'fw-b-disclosure-desktop-title-size';
-  const WIDTH_KEY = 'fw-b-disclosure-desktop-dialog-width';
+  const BOX_KEY   = 'fw-b-disclosure-desktop-box';
   const DESIGN = { p1: 18, p2: 16, p3: 14, p4: 13 };   /* @1920 기준 px */
   const FIXED  = { p3: true, p4: true };               /* ≤ 1rem → 뷰포트와 무관하게 고정 */
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
@@ -279,10 +288,10 @@ o 로그 기록
     readout();
   }
 
-  function setDialogWidth(mode) {
-    document.body.dataset.dialogWidth = mode;
-    $$('#widthToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.dialogWidth === mode));
-    store(WIDTH_KEY, mode);
+  function setBox(mode) {
+    document.body.dataset.box = mode;
+    $$('#boxToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.box === mode));
+    store(BOX_KEY, mode);
     readout();
   }
 
@@ -293,23 +302,24 @@ o 로그 기록
       `${DESIGN[size]}px @1920${FIXED[size] ? ' (고정)' : ''} · ${fs.toFixed(1)}px`;
 
     const w = $('.dialog').getBoundingClientRect().width;
-    const mode = document.body.dataset.dialogWidth;
-    $('#widthReadout').textContent =
-      `${w.toFixed(1)}px${mode === 'fluid' ? ' (29.1667vw)' : ''} · ${innerWidth}px`;
+    const pad = parseFloat(getComputedStyle($('.content')).paddingLeft);
+    const note = document.body.dataset.box === 'fluid-mid' ? ' (29.1667vw)' : '';
+    $('#boxReadout').textContent =
+      `${w.toFixed(1)}px${note} · pad ${pad.toFixed(1)}px · ${innerWidth}px`;
   }
 
   $('#titleToggle').addEventListener('click', e => {
     const b = e.target.closest('[data-title-size]');
     if (b) setTitleSize(b.dataset.titleSize);
   });
-  $('#widthToggle').addEventListener('click', e => {
-    const b = e.target.closest('[data-dialog-width]');
-    if (b) setDialogWidth(b.dataset.dialogWidth);
+  $('#boxToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-box]');
+    if (b) setBox(b.dataset.box);
   });
   window.addEventListener('resize', readout);
 
   setTitleSize(load(TITLE_KEY, 'p2'));
-  setDialogWidth(load(WIDTH_KEY, 'fixed'));
+  setBox(load(BOX_KEY, 'fixed-mid'));
 })();
 </script>
 
