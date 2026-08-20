@@ -19,7 +19,9 @@
      2) Spacing
         · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
         · px-*  : px 고정 — 이 화면에는 해당 없음
-     3) 다이얼로그 box 가로 너비 = 560px 고정
+     3) 다이얼로그 box 가로 너비 — 두 가지 안을 토글로 비교
+        · 고정 : 560px
+        · 가변 : 560 / 1920 = 29.1667vw  (1920 에서 560px)
      4) 그 외 = px
      5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
      ※ 헤더 타이틀은 우하단 데모 패널에서 P1~P4 로 바꿔 볼 수 있다 (기본 = 시안값 P2).
@@ -45,8 +47,10 @@
     --mid-16: calc( 8 * var(--us) + 8px);
     --mid-24: calc(16 * var(--us) + 8px);
 
-    /* 다이얼로그 box — 가로 고정 --------------------------------- */
-    --dialog-w: 560px;
+    /* 다이얼로그 box ---------------------------------------------- */
+    --dialog-w-fixed: 560px;              /* 고정 안 */
+    --dialog-w-fluid: 29.1667vw;          /* 가변 안 — 560 / 1920, 1920 에서 560px */
+    --dialog-w: var(--dialog-w-fixed);    /* 기본 = 고정 */
     --dialog-h: 746px;
     --dialog-max-h: 800px;
 
@@ -57,6 +61,9 @@
     --c-text: #111;
     --c-dim: rgba(0, 0, 0, 0.5);
   }
+
+  /* 다이얼로그 가로 너비 전환 (데모) */
+  body[data-dialog-width="fluid"] { --dialog-w: var(--dialog-w-fluid); }
 
   /* 헤더 타이틀 사이즈 전환 (데모) */
   body[data-title="p1"] { --fs-title: var(--fs-p1); }
@@ -93,7 +100,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: var(--dialog-w);        /* 560px 고정 */
+    width: var(--dialog-w);        /* 고정 560px / 가변 29.1667vw */
     height: var(--dialog-h);       /* 746px */
     max-height: min(var(--dialog-max-h), 100%);
     overflow: hidden;
@@ -167,9 +174,10 @@
     right: 16px;
     bottom: 16px;
     z-index: 500;
-    display: flex;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 6px 8px;
     align-items: center;
-    gap: 8px;
     padding: 8px 10px;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 6px;
@@ -244,39 +252,64 @@ o 로그 기록
     <button type="button" data-title-size="p4">P4</button>
   </div>
   <span class="demo-readout" id="titleReadout">–</span>
+
+  <strong>width</strong>
+  <div class="demo-seg" id="widthToggle">
+    <button type="button" data-dialog-width="fixed">고정 560</button>
+    <button type="button" data-dialog-width="fluid">가변 vw</button>
+  </div>
+  <span class="demo-readout" id="widthReadout">–</span>
 </nav>
 
 <script>
 (() => {
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const KEY = 'fw-b-disclosure-desktop-title-size';
+  const TITLE_KEY = 'fw-b-disclosure-desktop-title-size';
+  const WIDTH_KEY = 'fw-b-disclosure-desktop-dialog-width';
   const DESIGN = { p1: 18, p2: 16, p3: 14, p4: 13 };   /* @1920 기준 px */
   const FIXED  = { p3: true, p4: true };               /* ≤ 1rem → 뷰포트와 무관하게 고정 */
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
 
   function setTitleSize(size) {
     document.body.dataset.title = size;
     $$('#titleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.titleSize === size));
-    try { localStorage.setItem(KEY, size); } catch (e) {}
+    store(TITLE_KEY, size);
+    readout();
+  }
+
+  function setDialogWidth(mode) {
+    document.body.dataset.dialogWidth = mode;
+    $$('#widthToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.dialogWidth === mode));
+    store(WIDTH_KEY, mode);
     readout();
   }
 
   function readout() {
     const size = document.body.dataset.title;
-    const actual = parseFloat(getComputedStyle($('.dialog .title')).fontSize);
-    const note = FIXED[size] ? ' (고정)' : '';
-    $('#titleReadout').textContent = `${DESIGN[size]}px @1920${note} · ${actual.toFixed(1)}px`;
+    const fs = parseFloat(getComputedStyle($('.dialog .title')).fontSize);
+    $('#titleReadout').textContent =
+      `${DESIGN[size]}px @1920${FIXED[size] ? ' (고정)' : ''} · ${fs.toFixed(1)}px`;
+
+    const w = $('.dialog').getBoundingClientRect().width;
+    const mode = document.body.dataset.dialogWidth;
+    $('#widthReadout').textContent =
+      `${w.toFixed(1)}px${mode === 'fluid' ? ' (29.1667vw)' : ''} · ${innerWidth}px`;
   }
 
   $('#titleToggle').addEventListener('click', e => {
     const b = e.target.closest('[data-title-size]');
     if (b) setTitleSize(b.dataset.titleSize);
   });
+  $('#widthToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-dialog-width]');
+    if (b) setDialogWidth(b.dataset.dialogWidth);
+  });
   window.addEventListener('resize', readout);
 
-  let saved = 'p2';
-  try { saved = localStorage.getItem(KEY) || 'p2'; } catch (e) {}
-  setTitleSize(saved);
+  setTitleSize(load(TITLE_KEY, 'p2'));
+  setDialogWidth(load(WIDTH_KEY, 'fixed'));
 })();
 </script>
 
