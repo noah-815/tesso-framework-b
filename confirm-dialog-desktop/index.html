@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirm Dialog — Desktop (Framework B)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Unit system — desktop (viewport ≥ 768)
+     디자인 기준 폭: 1920
+
+     1) Typography
+        font-size = (size value − 1) × 0.0083 × screen width + 1rem
+        · size value = rem (1rem = 14px), 0.0083 × screen width = 0.83vw
+        · size value ≤ 1rem(14px) 은 뷰포트와 무관하게 px 고정
+     2) Spacing
+        · mid-* : (값 − 8) × 100vw / 1920 + 8, 값 < 8 이면 값 그대로 고정
+        · px-*  : px 고정 — 이 화면에는 해당 없음
+     3) 다이얼로그 box — 세 가지 안을 토글로 비교
+        · 400 + mid : 너비 400px 고정 + 내부 여백 mid-* (가변)   ← 기본
+        · 400 + px  : 너비 400px 고정 + 내부 여백 px 고정 (@1920 값)
+        · vw + mid  : 너비 20.8333vw 가변 + 내부 여백 mid-* (가변)
+          20.8333vw = 400 / 1920 → 1920 에서 400px
+     4) 그 외 = px
+     5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+     ※ 타이틀은 우하단 데모 패널에서 P1~P4 로 바꿔 볼 수 있다 (기본 = 시안값 P2).
+       P1/P2 는 1rem 초과라 가변, P3(1rem)/P4(0.929rem) 는 고정이다.
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --us: calc(100vw / 1920);       /* spacing 1px (mid-* 계산용) */
+
+    /* Typography ------------------------------------------------- */
+    --fs-p4:    13px;               /* paragraph-4        0.929rem → 고정 */
+    --fs-p3:    14px;               /* paragraph-3        1rem     → 고정 */
+    --fs-btn-l: 13px;               /* button-label-large 0.929rem → 고정 */
+    --fs-p2:    calc((1.1429 - 1) * 0.83vw + 1rem);   /* paragraph-2 16px @1920 — 가변 */
+    --fs-p1:    calc((1.2857 - 1) * 0.83vw + 1rem);   /* paragraph-1 18px @1920 — 가변 */
+
+    /* 타이틀 사이즈 — 시안 기본값은 P2 */
+    --fs-title: var(--fs-p2);
+
+    /* Spacing — mid-* : (값 − 8) × 100vw / 1920 + 8 ---------------- */
+    --mid-4:  4px;                  /* 값 < 8 → 값 그대로 고정 */
+    --mid-8:  8px;                  /* 공식 결과도 8px (증감 없음) */
+    --mid-20: calc(12 * var(--us) + 8px);
+    --mid-24: calc(16 * var(--us) + 8px);
+    --mid-32: calc(24 * var(--us) + 8px);
+
+    /* 다이얼로그 box ---------------------------------------------- */
+    --dialog-w-fixed: 400px;              /* 고정 안 */
+    --dialog-w-fluid: 20.8333vw;          /* 가변 안 — 400 / 1920, 1920 에서 400px */
+    --dialog-w: var(--dialog-w-fixed);    /* 기본 = 고정 */
+
+    /* Font / Color ----------------------------------------------- */
+    /* 영문 = Work Sans, 국문 = Pretendard.
+       Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백된다. */
+    --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
+    --c-text: #111;
+    --c-sub: #6a6a6a;
+    --c-line-strong: rgba(0, 0, 0, 0.12);
+    --c-dim: rgba(0, 0, 0, 0.5);
+  }
+
+  /* 다이얼로그 box 안 전환 (데모) — --dialog-w 와 mid-* 만 덮어쓴다 */
+  body[data-box="fixed-px"] {         /* 내부 여백을 @1920 값으로 고정 */
+    --mid-4:  4px;
+    --mid-8:  8px;
+    --mid-20: 20px;
+    --mid-24: 24px;
+    --mid-32: 32px;
+  }
+  body[data-box="fluid-mid"] { --dialog-w: var(--dialog-w-fluid); }
+
+  /* 타이틀 사이즈 전환 (데모) */
+  body[data-title="p1"] { --fs-title: var(--fs-p1); }
+  body[data-title="p2"] { --fs-title: var(--fs-p2); }
+  body[data-title="p3"] { --fs-title: var(--fs-p3); }
+  body[data-title="p4"] { --fs-title: var(--fs-p4); }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;               /* 1rem = 14px */
+  }
+  body {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+  .dim { position: absolute; inset: 0; z-index: 1; background: var(--c-dim); }
+
+  /* ── dialog ──────────────────────────────────────────────────── */
+  .dialog {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--mid-32);
+    width: var(--dialog-w);        /* 고정 400px / 가변 20.8333vw */
+    max-width: calc(100% - 40px);
+    padding: var(--mid-32) var(--mid-20) var(--mid-24);
+    overflow: hidden;
+    background: #fff;
+  }
+  .dialog .title-desc {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-8);
+    width: 100%;
+    padding: 0 var(--mid-4);
+    line-height: 1.6;
+    text-align: center;
+  }
+  .dialog .title-desc .t {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-title);    /* 기본 P2 = 16px @1920 — 가변 */
+    color: var(--c-text);
+  }
+  .dialog .title-desc .d {
+    width: 100%;
+    font-size: var(--fs-p4);       /* 13px — 고정 */
+    color: var(--c-sub);
+  }
+  .dialog .button-group {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-8);
+    width: 100%;
+  }
+  .dialog .btn {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 14px 22px;            /* 토큰 없음 → px */
+    border: 1px solid var(--c-line-strong);
+    font-weight: 500;
+    font-size: var(--fs-btn-l);    /* 13px — 고정 */
+    line-height: 1.2;
+    text-align: center;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  .dialog .btn.primary {
+    border-color: transparent;
+    background: #111;
+    color: #fff;
+  }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    z-index: 500;
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 6px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-readout { color: #999; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+
+<div class="dim"></div>
+
+<div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="dialogTitle" aria-describedby="dialogDesc">
+  <div class="title-desc">
+    <p class="t" id="dialogTitle">로그인이 필요해요</p>
+    <p class="d" id="dialogDesc">로그인 페이지로 이동할까요?</p>
+  </div>
+  <div class="button-group">
+    <button type="button" class="btn">취소</button>
+    <button type="button" class="btn primary">로그인</button>
+  </div>
+</div>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <strong>title</strong>
+  <div class="demo-seg" id="titleToggle">
+    <button type="button" data-title-size="p1">P1</button>
+    <button type="button" data-title-size="p2">P2</button>
+    <button type="button" data-title-size="p3">P3</button>
+    <button type="button" data-title-size="p4">P4</button>
+  </div>
+  <span class="demo-readout" id="titleReadout">–</span>
+
+  <strong>box</strong>
+  <div class="demo-seg" id="boxToggle">
+    <button type="button" data-box="fixed-mid">400 + mid</button>
+    <button type="button" data-box="fixed-px">400 + px</button>
+    <button type="button" data-box="fluid-mid">vw + mid</button>
+  </div>
+  <span class="demo-readout" id="boxReadout">–</span>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const TITLE_KEY = 'fw-b-confirm-dialog-title-size';
+  const BOX_KEY   = 'fw-b-confirm-dialog-box';
+  const DESIGN = { p1: 18, p2: 16, p3: 14, p4: 13 };   /* @1920 기준 px */
+  const FIXED  = { p3: true, p4: true };               /* ≤ 1rem → 뷰포트와 무관하게 고정 */
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+
+  function setTitleSize(size) {
+    document.body.dataset.title = size;
+    $$('#titleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.titleSize === size));
+    store(TITLE_KEY, size);
+    readout();
+  }
+
+  function setBox(mode) {
+    document.body.dataset.box = mode;
+    $$('#boxToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.box === mode));
+    store(BOX_KEY, mode);
+    readout();
+  }
+
+  function readout() {
+    const size = document.body.dataset.title;
+    const fs = parseFloat(getComputedStyle($('.title-desc .t')).fontSize);
+    $('#titleReadout').textContent =
+      `${DESIGN[size]}px @1920${FIXED[size] ? ' (고정)' : ''} · ${fs.toFixed(1)}px`;
+
+    const w = $('.dialog').getBoundingClientRect().width;
+    const pad = parseFloat(getComputedStyle($('.dialog')).paddingLeft);
+    const note = document.body.dataset.box === 'fluid-mid' ? ' (20.8333vw)' : '';
+    $('#boxReadout').textContent =
+      `${w.toFixed(1)}px${note} · pad ${pad.toFixed(1)}px · ${innerWidth}px`;
+  }
+
+  $('#titleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-title-size]');
+    if (b) setTitleSize(b.dataset.titleSize);
+  });
+  $('#boxToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-box]');
+    if (b) setBox(b.dataset.box);
+  });
+  window.addEventListener('resize', readout);
+
+  setTitleSize(load(TITLE_KEY, 'p2'));
+  setBox(load(BOX_KEY, 'fixed-mid'));
+})();
+</script>
+
+</body>
+</html>
