@@ -17,13 +17,13 @@
         · size value = rem (1rem = 14px)
         · 450px 이후 고정  → --tw: min(100vw, 450px)
         · "size value ≤ 1rem 은 고정" 예외는 모바일에서 적용하지 않음 → 전부 가변
-        ※ statusBar 시간(17px) 등 디바이스 목업만 가변 로직 제외 → px 고정
      2) Spacing
         · mid-* : (값 − 8) × 100vw / 390 + 8, 값 < 8 이면 값 그대로 고정
         · px-*  : px 고정 — 이 화면에는 해당 없음
           (시안의 헤더 상단 padding px-20 은 mid-20 으로 변경 적용)
      3) 그 외 = px
      4) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+     ※ 헤더 타이틀은 하단 데모 패널에서 P1~P4 로 바꿔 볼 수 있다 (기본 = 시안값 P2)
      ───────────────────────────────────────────────────────────── */
   :root {
     /* 기준 단위 -------------------------------------------------- */
@@ -35,9 +35,14 @@
        --us: calc(var(--tw) / 390);                                   */
 
     /* Typography — 전부 가변 (450px 이후 고정) --------------------- */
-    --fs-p3:    calc(14 * var(--ut));   /* paragraph-3        14px @390 */
+    --fs-p1:    calc(18 * var(--ut));   /* paragraph-1        18px @390 */
     --fs-p2:    calc(16 * var(--ut));   /* paragraph-2        16px @390 */
+    --fs-p3:    calc(14 * var(--ut));   /* paragraph-3        14px @390 */
+    --fs-p4:    calc(13 * var(--ut));   /* paragraph-4        13px @390 */
     --fs-btn-l: calc(13 * var(--ut));   /* button-label-large 13px @390 */
+
+    /* 헤더 타이틀 사이즈 — 시안 기본값은 P2 */
+    --fs-title: var(--fs-p2);
 
     /* Spacing ---------------------------------------------------- */
     /* mid-* : (값 − 8) × 100vw / 390 + 8 · 값 < 8 → 값 그대로 고정 */
@@ -51,6 +56,12 @@
     --c-text: #111;
     --c-dim: rgba(0, 0, 0, 0.5);
   }
+
+  /* 헤더 타이틀 사이즈 전환 (데모) */
+  body[data-title="p1"] { --fs-title: var(--fs-p1); }
+  body[data-title="p2"] { --fs-title: var(--fs-p2); }
+  body[data-title="p3"] { --fs-title: var(--fs-p3); }
+  body[data-title="p4"] { --fs-title: var(--fs-p4); }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html {
@@ -71,29 +82,6 @@
   }
   button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
   img { display: block; }
-
-  /* ── statusBar — 디바이스 목업 (실서비스에서는 제거) : px ─────── */
-  .status-bar {
-    position: relative;
-    flex-shrink: 0;
-    height: 54px;
-    background: #fff;
-  }
-  .status-bar .time {
-    position: absolute;
-    left: 0;
-    top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 138px;
-    height: 54px;
-    font-weight: 600;
-    font-size: 17px;               /* 디바이스 목업 — 고정 */
-    line-height: 22px;
-    color: #000;
-  }
-  .status-bar .levels { position: absolute; right: 0; top: 0; width: 140.5px; height: 54px; }
 
   /* ── contentArea + dim ───────────────────────────────────────── */
   .content-area {
@@ -132,7 +120,7 @@
     flex: 1 0 0;
     min-width: 0;
     font-weight: 500;
-    font-size: var(--fs-p2);       /* 16px @390 — 가변 */
+    font-size: var(--fs-title);    /* 기본 P2 = 16px @390 — 가변 */
     line-height: 1.6;
     color: var(--c-text);
   }
@@ -181,86 +169,38 @@
     white-space: nowrap;
   }
 
-  /* ── browser — 디바이스 목업 (실서비스에서는 제거) : px ───────── */
-  .browser {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 18px 10px 30px;
-    background: #fff;
-  }
-  .browser .tabs {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    max-width: 100%;
-  }
-  .browser .pill {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 48px;
-    height: 48px;
-    border: 1px solid #fff;
-    border-radius: 24px;
-    background: rgba(250, 250, 250, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 40px rgba(0, 0, 0, 0.1);
-    font-size: 23px;
-    line-height: 1;
-    color: #111;
-  }
-  .browser .search-bar {
-    position: relative;
-    flex-shrink: 1;
-    width: 218px;
-    min-width: 0;
-    height: 48px;
-    border: 1px solid #fff;
-    border-radius: 24px;
-    background: rgba(250, 250, 250, 0.7);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 42px rgba(0, 0, 0, 0.1);
-  }
-  .browser .search-bar .url {
-    position: absolute;
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-weight: 500;
-    font-size: 16px;               /* 디바이스 목업 — 고정 */
-    color: #111;
+    bottom: 16px;
+    z-index: 500;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+    font-size: 11px;
+    line-height: 1.4;
     white-space: nowrap;
   }
-  .browser .search-bar .site-settings {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 15px;
-    height: 18px;
-  }
-  .browser .search-bar .reload {
-    position: absolute;
-    right: 12.24px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 14.757px;
-    height: 17.982px;
-  }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-readout { color: #999; font-variant-numeric: tabular-nums; }
+
 </style>
 </head>
 <body>
-
-<!-- statusBar : 디바이스 목업 -->
-<div class="status-bar">
-  <div class="time">9:41</div>
-  <img class="levels" src="assets/status-levels.svg" alt="">
-</div>
 
 <div class="content-area">
   <div class="dim"></div>
@@ -306,18 +246,49 @@ o 로그 기록
   </div>
 </div>
 
-<!-- browser : 디바이스 목업 -->
-<div class="browser">
-  <div class="tabs">
-    <div class="pill" aria-hidden="true">‹</div>
-    <div class="search-bar">
-      <img class="site-settings" src="assets/site-settings.svg" alt="">
-      <span class="url">tesso.io</span>
-      <img class="reload" src="assets/reload.svg" alt="">
-    </div>
-    <div class="pill" aria-hidden="true">···</div>
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <strong>title</strong>
+  <div class="demo-seg" id="titleToggle">
+    <button type="button" data-title-size="p1">P1</button>
+    <button type="button" data-title-size="p2">P2</button>
+    <button type="button" data-title-size="p3">P3</button>
+    <button type="button" data-title-size="p4">P4</button>
   </div>
-</div>
+  <span class="demo-readout" id="titleReadout">–</span>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const KEY = 'fw-b-disclosure-title-size';
+  const DESIGN = { p1: 18, p2: 16, p3: 14, p4: 13 };   /* @390 기준 px */
+
+  function setTitleSize(size) {
+    document.body.dataset.title = size;
+    $$('#titleToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.titleSize === size));
+    try { localStorage.setItem(KEY, size); } catch (e) {}
+    readout();
+  }
+
+  function readout() {
+    const size = document.body.dataset.title;
+    const actual = parseFloat(getComputedStyle($('.dialog .title')).fontSize);
+    $('#titleReadout').textContent = `${DESIGN[size]}px @390 · ${actual.toFixed(1)}px`;
+  }
+
+  $('#titleToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-title-size]');
+    if (b) setTitleSize(b.dataset.titleSize);
+  });
+  window.addEventListener('resize', readout);
+
+  let saved = 'p2';
+  try { saved = localStorage.getItem(KEY) || 'p2'; } catch (e) {}
+  setTitleSize(saved);
+})();
+</script>
 
 </body>
 </html>

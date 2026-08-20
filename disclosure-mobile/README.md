@@ -6,9 +6,10 @@ Figma node `2828:20429` (device=mobile) — 개인정보 수집/이용 및 처�
 의존성 없는 단일 HTML 파일입니다. `index.html`을 브라우저로 열면 바로 확인됩니다.
 
 ```
-index.html      # 마크업 + 전체 스타일
-assets/         # Figma 익스포트 (status-levels, site-settings, reload)
+index.html      # 마크업 + 전체 스타일 (외부 에셋 없음)
 ```
+
+디바이스 목업(상단 statusBar · 하단 브라우저 바)은 제외하고 다이얼로그만 구현했습니다.
 
 단위 규칙은 `framework-b-search-mobile` 과 동일합니다.
 
@@ -31,9 +32,26 @@ assets/         # Figma 익스포트 (status-levels, site-settings, reload)
 |---|---|---|---|
 | `button-label-large` 13px | 10.66px | 13px | 15px |
 | `paragraph-3` 14px (본문) | 11.48px | 14px | 16.15px |
-| `paragraph-2` 16px (타이틀) | 13.13px | 16px | 18.46px |
+| `paragraph-2` 16px (타이틀 기본값) | 13.13px | 16px | 18.46px |
+| `paragraph-1` 18px | 14.77px | 18px | 20.77px |
 
-statusBar 시간(17px)과 브라우저 바 URL(16px)은 디바이스 목업이라 px 고정입니다.
+#### 타이틀 사이즈 전환
+
+헤더 타이틀을 P1~P4 로 바꿔 볼 수 있습니다. 하단 데모 패널에서 선택하며, 값은
+localStorage 에 저장됩니다. 기본값은 시안대로 P2 입니다.
+
+```css
+--fs-title: var(--fs-p2);                            /* 기본 = 시안값 */
+body[data-title="p1"] { --fs-title: var(--fs-p1); }  /* p2 / p3 / p4 동일 */
+```
+
+| | @390 | @320 | @450 이상 |
+|---|---|---|---|
+| P1 | 18px | 14.77px | 20.77px |
+| **P2 (기본)** | 16px | 13.13px | 18.46px |
+| P3 | 14px | 11.48px | 16.15px |
+| P4 | 13px | 10.66px | 15px |
+
 
 ### 2. spacing
 
@@ -60,8 +78,7 @@ statusBar 시간(17px)과 브라우저 바 URL(16px)은 디바이스 목업이�
 
 ### 3. 그 외 px
 
-statusBar 54px, 다이얼로그 높이 480px, 버튼 높이 44px · padding 14/22px,
-브라우저 바 18/30/10px · 알약 48px · 검색바 218px, hairline 1px.
+다이얼로그 높이 480px, 버튼 높이 44px · padding 14/22px, hairline 1px.
 
 ### 4. 폰트
 
@@ -69,8 +86,8 @@ statusBar 54px, 다이얼로그 높이 480px, 버튼 높이 44px · padding 14/2
 --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
 ```
 
-Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백됩니다. `tesso.io`, `9:41` 같은
-영문·숫자는 Work Sans, 본문 국문은 Pretendard 로 문자 단위 분기됩니다.
+Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백됩니다. 본문의 숫자·영문은
+Work Sans, 국문은 Pretendard 로 문자 단위 분기됩니다.
 
 ## 검증
 
@@ -81,7 +98,7 @@ Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백됩니�
 | dialog 폭 | 280px | 350px | 353px (상한) |
 | 가로 스크롤 | 없음 | 없음 | 없음 |
 
-본문 스크롤 동작 확인 (scrollHeight 918 / clientHeight 309). 콘솔 에러 없음.
+본문 스크롤 동작, 타이틀 P1~P4 전환(18 / 16 / 14 / 13px @390) 확인. 콘솔 에러 없음.
 
 ## 시안과 다르게 처리한 것
 
@@ -90,8 +107,7 @@ Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백됩니�
   393 에서는 시안과 동일하고, 320 에서는 280px 이 됩니다.
 - **다이얼로그 높이** — 480px 고정이되 `max-height: 100%` 를 함께 걸어 세로가 짧은 기기에서
   잘리지 않게 했습니다.
-- **브라우저 바 좌/우 버튼** — 시안이 SF Symbols 글리프(폰트)라 익스포트 에셋이 없습니다.
-  디바이스 목업이므로 `‹` / `···` 텍스트 글리프로 대체했습니다. 검색바 안의 site settings·
-  reload 아이콘은 Figma 익스포트 SVG 를 그대로 씁니다.
-- **statusBar / browser** — 디바이스 목업입니다. 실서비스 적용 시 `.status-bar` 와
-  `.browser` 블록을 지우고 `.content-area` 만 남기면 됩니다.
+- **헤더 상단 padding** — 시안은 `px-20`(고정)이나 요청에 따라 `mid-20`(가변)으로 통일.
+- **디바이스 목업 제외** — 상단 statusBar 와 하단 브라우저 바는 구현에서 제외했습니다.
+- **하단 데모 패널** — 시안에 없는 요소입니다. `.demo-nav` / `.demo-seg` / `.demo-readout`
+  CSS 와 `#demoNav` 마크업, 그 아래 스크립트를 지우면 됩니다.

@@ -9,7 +9,7 @@ Figma: `0_Current / 02_Framework B` — node `2294:13739`
 
 ```
 index.html      # 마크업 + 전체 스타일
-assets/         # Figma 익스포트 (search, chevron-left/right, status-levels, thumbnail)
+assets/         # Figma 익스포트 (search, chevron-left/right, thumbnail)
 ```
 
 ## 단위 체계
@@ -34,7 +34,6 @@ assets/         # Figma 익스포트 (search, chevron-left/right, status-levels,
 | `caption-1` / `paragraph-4` | 13px | 10.67px | 15.00px | 가변 |
 | `paragraph-3` | 14px | 11.49px | 16.15px | 가변 |
 | BRAND 로고 | 20px | 20px | 20px | 고정 — 가변 로직 제외 |
-| statusBar 시간 | 17px | 17px | 17px | 고정 — 가변 로직 제외 |
 
 ```css
 --ut: calc(var(--tw) / 390);    /* 타이포 1px */
@@ -43,7 +42,6 @@ assets/         # Figma 익스포트 (search, chevron-left/right, status-levels,
 --fs-p4: calc(13 * var(--ut));
 --fs-p3: calc(14 * var(--ut));
 --fs-logo: 20px;                /* 제외 */
---fs-status: 17px;              /* 제외 */
 ```
 
 ### 2. spacing (`mid-*` 토큰)
@@ -104,7 +102,7 @@ badge left/top 12px, pagination 버튼 32px · 글리프 24px, hairline 1px.
 | `paragraph-4` (본문·상품명) | 10.67px | 13px | 15px |
 | `caption-2` | 9.85px | 12px | 13.85px |
 | `paragraph-3` | 11.49px | 14px | 16.15px |
-| BRAND / statusBar 시간 | 20 / 17px | 20 / 17px | 20 / 17px |
+| BRAND 로고 | 20px | 20px | 20px |
 | search 아이콘 (1.6154em) | 17.23px | 21px | 24.23px |
 | badge padding (0.6667/0.8333em) | 6.56 / 8.20px | 8 / 10px | 9.23 / 11.54px |
 | `mid-2` / `4` / `6` / `8` | 2 / 4 / 6 / 8px | 2 / 4 / 6 / 8px | 2 / 4 / 6 / 8px |
@@ -127,5 +125,4 @@ badge left/top 12px, pagination 버튼 32px · 글리프 24px, hairline 1px.
 
 ## 참고
 
-`.status-bar` 와 `.browser-bar` 는 디바이스 목업입니다. 실서비스 적용 시 두 블록과
-`body { padding-bottom: 60px }` 를 함께 제거하세요.
+디바이스 목업(상단 statusBar · 하단 브라우저 바)은 제외하고 서비스 화면만 구현했습니다.
