@@ -24,9 +24,10 @@
      5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
 
      ※ 이 화면의 확인 목적
-       섹션 content 의 min-height 를 mid-120 으로 뒀을 때 뷰포트별로 적절한지.
-       우하단 패널에서 주문 건수(0~3)와 min-height 안(mid-120 / mid-100 / 120px 시안값 /
-       off)을 바꿔가며 비교할 수 있고, 읽기값에 계산값·실제 높이·적용 여부가 표시된다.
+       섹션 content 의 min-height 가 뷰포트별로 적절한지.
+       우하단 패널에서 주문 건수(0~3), min-height 방식(mid 공식 / px 고정 / 해제),
+       그리고 그 값을 직접 입력해 비교할 수 있다. 기본값은 mid-120.
+       읽기값에 계산값·실제 콘텐츠 높이·적용 여부가 표시된다.
      ───────────────────────────────────────────────────────────── */
   :root {
     /* 기준 단위 -------------------------------------------------- */
@@ -58,8 +59,10 @@
     /* px-* : 뷰포트와 무관하게 px 고정 */
     --px-12:   12px;
 
-    /* 검증 대상 — 섹션 content 의 min-height */
-    --section-min-h: var(--mid-120);
+    /* 검증 대상 — 섹션 content 의 min-height
+       --minh-val 은 데모 패널이 body 에 숫자로 심는다 (기본 120) */
+    --minh-val: 120;
+    --section-min-h: max(0px, calc((var(--minh-val) - 8) * var(--us) + 8px));
 
     /* Grid — 12컬럼 / 거터 16px / 좌우 19px (모두 px) --------------- */
     --grid-gutter: 16px;
@@ -74,10 +77,10 @@
     --c-line: rgba(0, 0, 0, 0.1);
   }
 
-  /* min-height 안 전환 (데모) */
-  body[data-minh="mid100"]   { --section-min-h: var(--mid-100); }
-  body[data-minh="fixed120"] { --section-min-h: 120px; }   /* 시안 현재값 */
-  body[data-minh="off"]      { --section-min-h: 0px; }
+  /* min-height 안 전환 (데모) — mid 공식 / px 고정 / 해제 */
+  body[data-minh="mid"] { --section-min-h: max(0px, calc((var(--minh-val) - 8) * var(--us) + 8px)); }
+  body[data-minh="px"]  { --section-min-h: calc(var(--minh-val) * 1px); }
+  body[data-minh="off"] { --section-min-h: 0px; }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html {
@@ -359,6 +362,20 @@
   .demo-seg button { padding: 4px 9px; color: #777; background: #fff; }
   .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
   .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-value { display: flex; align-items: center; gap: 6px; color: #777; }
+  .demo-value input[type="number"] {
+    width: 58px;
+    padding: 3px 5px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    color: #111;
+  }
+  .demo-value input[type="number"]:disabled { color: #bbb; background: #fafafa; }
+  .demo-value.is-off { opacity: 0.55; }
+  .demo-value .calc { font-variant-numeric: tabular-nums; }
   .demo-readout {
     grid-column: 1 / -1;
     padding-top: 2px;
@@ -466,10 +483,15 @@
 
   <strong>min-h</strong>
   <div class="demo-seg" id="minhToggle">
-    <button type="button" data-minh="mid120">mid-120</button>
-    <button type="button" data-minh="mid100">mid-100</button>
-    <button type="button" data-minh="fixed120">120px</button>
+    <button type="button" data-minh="mid">mid</button>
+    <button type="button" data-minh="px">px</button>
     <button type="button" data-minh="off">off</button>
+  </div>
+
+  <strong>값</strong>
+  <div class="demo-value" id="minhValueWrap">
+    <input type="number" id="minhValue" min="0" max="400" step="4" value="120">
+    <span class="calc" id="minhCalc">–</span>
   </div>
 
   <p class="demo-readout" id="readout">–</p>
@@ -480,7 +502,8 @@
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const ORDERS_KEY = 'fw-b-mypage-orders';
-  const MINH_KEY   = 'fw-b-mypage-minh-v2';   /* 기본값 mid-120 로 변경 */
+  const MINH_KEY   = 'fw-b-mypage-minh-v3';   /* mid 값 직접 입력 방식으로 변경 */
+  const MINH_VAL_KEYS = { mid: 'fw-b-mypage-minh-mid-v3', px: 'fw-b-mypage-minh-px-v3' };
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
 
@@ -518,11 +541,33 @@
     readout();
   }
 
+  const clampVal = () => {
+    const raw = parseFloat($('#minhValue').value);
+    return Number.isFinite(raw) ? Math.min(400, Math.max(0, raw)) : null;
+  };
+
+  function applyMinH() {
+    const mode = document.body.dataset.minh;
+    const val = clampVal();
+    const off = mode === 'off';
+    $('#minhValue').disabled = off;
+    $('#minhValueWrap').classList.toggle('is-off', off);
+    if (val !== null) {
+      document.body.style.setProperty('--minh-val', String(val));
+      if (mode !== 'off') store(MINH_VAL_KEYS[mode], String(val));
+    }
+    $('#minhCalc').textContent =
+      off ? '해제' : mode === 'px' ? `${val}px 고정` : `mid-${val}`;
+    readout();
+  }
+
   function setMinH(mode) {
     document.body.dataset.minh = mode;
     $$('#minhToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.minh === mode));
     store(MINH_KEY, mode);
-    readout();
+    /* 모드별로 마지막 값을 기억 — mid 는 120, px 도 120 이 기본 */
+    if (mode !== 'off') $('#minhValue').value = load(MINH_VAL_KEYS[mode], '120');
+    applyMinH();
   }
 
   function readout() {
@@ -550,10 +595,40 @@
     const b = e.target.closest('[data-minh]');
     if (b) setMinH(b.dataset.minh);
   });
+  $('#minhValue').addEventListener('input', applyMinH);
+  $('#minhValue').addEventListener('change', () => {
+    const v = clampVal();
+    if (v !== null) $('#minhValue').value = v;   /* 범위 밖 입력은 확정 시 보정 */
+    applyMinH();
+  });
   window.addEventListener('resize', readout);
 
+  window.__matrix = (cases) => {
+    const body = $('#orderBody');
+    const out = { vw: innerWidth };
+    cases.forEach(([mode, val]) => {
+      setMinH(mode);
+      $('#minhValue').value = val;
+      applyMinH();
+      const minH = parseFloat(getComputedStyle(body).minHeight) || 0;
+      const rows = {};
+      [0, 1, 2, 3].forEach(n => {
+        setOrders(n);
+        const prev = body.style.minHeight;
+        body.style.minHeight = '0px';
+        const nat = body.getBoundingClientRect().height;
+        body.style.minHeight = prev;
+        const app = body.getBoundingClientRect().height;
+        rows[n] = `${nat.toFixed(1)} → ${app.toFixed(1)}${minH > nat + 0.5 ? ' (min)' : ''}`;
+      });
+      out[`${mode}-${val}`] = { minH: +minH.toFixed(2), rows };
+    });
+    setMinH('mid'); setOrders(1);
+    return out;
+  };
+
   setOrders(Number(load(ORDERS_KEY, '1')));
-  setMinH(load(MINH_KEY, 'mid120'));
+  setMinH(load(MINH_KEY, 'mid'));
 })();
 </script>
 
