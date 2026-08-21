@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>My Page — Mobile Responsive (Framework B)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* ─────────────────────────────────────────────────────────────
+     Unit system — mobile (viewport ≤ 767)
+     디자인 기준 폭: 390 (시안 프레임 393)
+
+     1) Typography
+        font-size = size value × screen width / 390
+        · size value = rem (1rem = 14px)
+        · 450px 이후 고정  → --tw: min(100vw, 450px)
+        · "size value ≤ 1rem 은 고정" 예외는 모바일에서 적용하지 않음 → 전부 가변
+        ※ BRAND 로고(20px)만 가변 로직 제외 → px 고정
+     2) Spacing
+        · mid-* : (값 − 8) × 100vw / 390 + 8, 값 < 8 이면 값 그대로 고정
+        · px-*  : px 고정 (뷰포트와 무관) — 좌우 여백 px-16
+     3) 버튼 padding = em (해당 버튼의 label 사이즈 기준)
+     4) 그 외 = px
+     5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
+
+     ※ 이 화면의 확인 목적
+       섹션 content 의 min-height 를 mid-100 으로 뒀을 때 뷰포트별로 적절한지.
+       우하단 패널에서 주문 건수(0~3)와 min-height 안(mid-100 / 100px 시안값 / off)을
+       바꿔가며 비교할 수 있고, 읽기값에 계산값·실제 높이·적용 여부가 표시된다.
+     ───────────────────────────────────────────────────────────── */
+  :root {
+    /* 기준 단위 -------------------------------------------------- */
+    --tw: min(100vw, 450px);        /* 타이포 기준 폭 (450px 이후 고정) */
+    --ut: calc(var(--tw) / 390);    /* 타이포 1px */
+    --us: calc(100vw / 390);        /* spacing 1px (mid-* 계산용) */
+    /* ↑ mid-* 는 명세대로 450px 고정 없이 100vw 로 계속 증가한다.
+       타이포와 동일하게 450px 에서 멈추려면 아래 한 줄로 교체:
+       --us: calc(var(--tw) / 390);                                   */
+
+    /* Typography — 전부 가변 (450px 이후 고정) --------------------- */
+    --fs-c2:    calc(12 * var(--ut));   /* caption-2          12px @390 */
+    --fs-p4:    calc(13 * var(--ut));   /* paragraph-4        13px @390 */
+    --fs-p3:    calc(14 * var(--ut));   /* paragraph-3        14px @390 */
+    --fs-p1:    calc(18 * var(--ut));   /* paragraph-1        18px @390 */
+    --fs-btn-l: calc(13 * var(--ut));   /* button-label-large 13px @390 */
+    /* 가변 로직 제외 → px 고정 */
+    --fs-logo:  20px;               /* BRAND 로고 — 고정 */
+
+    /* Spacing — mid-* : (값 − 8) × 100vw / 390 + 8 ----------------- */
+    --mid-4:   4px;                 /* 값 < 8 → 값 그대로 고정 */
+    --mid-6:   6px;
+    --mid-8:   8px;                 /* 공식 결과도 8px (증감 없음) */
+    --mid-12:  calc( 4 * var(--us) + 8px);
+    --mid-16:  calc( 8 * var(--us) + 8px);
+    --mid-20:  calc(12 * var(--us) + 8px);
+    --mid-24:  calc(16 * var(--us) + 8px);
+    --mid-32:  calc(24 * var(--us) + 8px);
+    --mid-40:  calc(32 * var(--us) + 8px);
+    --mid-100: calc(92 * var(--us) + 8px);
+    /* px-* : 뷰포트와 무관하게 px 고정 */
+    --px-16:   16px;
+
+    /* 검증 대상 — 섹션 content 의 min-height */
+    --section-min-h: var(--mid-100);
+
+    /* Font / Color ----------------------------------------------- */
+    /* 영문 = Work Sans, 국문 = Pretendard.
+       Work Sans 에 한글 글리프가 없어 한글만 Pretendard 로 폴백된다. */
+    --font: "Work Sans", "Pretendard Variable", Pretendard, sans-serif;
+    --c-text: #111;
+    --c-sub: #6a6a6a;
+    --c-muted: rgba(17, 17, 17, 0.5);
+    --c-header-text: #372320;
+    --c-line: rgba(0, 0, 0, 0.1);
+  }
+
+  /* min-height 안 전환 (데모) */
+  body[data-minh="fixed100"] { --section-min-h: 100px; }   /* 시안 현재값 */
+  body[data-minh="off"]      { --section-min-h: 0px; }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html {
+    -webkit-text-size-adjust: 100%;
+    font-size: 14px;               /* 1rem = 14px */
+    overflow-x: hidden;
+  }
+  body {
+    font-family: var(--font);
+    color: var(--c-text);
+    background: #fff;
+    word-break: keep-all;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+  img { display: block; }
+
+  /* ── mobileH_header ──────────────────────────────────────────── */
+  .header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;                  /* 토큰 없음 → px */
+    padding: 0 16px;
+    background: #fff;
+  }
+  .header .util {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    min-width: 48px;
+    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
+    line-height: normal;
+    text-transform: uppercase;
+    color: var(--c-header-text);
+    white-space: nowrap;
+  }
+  .header .util.bag { justify-content: flex-end; }
+  .header .logo {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    font-size: var(--fs-logo);     /* 20px — 고정 */
+    line-height: 1.4;
+    color: var(--c-header-text);
+    white-space: nowrap;
+  }
+
+  /* ── titleArea ───────────────────────────────────────────────── */
+  .title-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--mid-20) var(--px-16) var(--mid-16);
+    background: #fff;
+  }
+  .title-area h1 {
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p1);       /* 18px @390 — 가변 */
+    line-height: 1.5;
+    color: var(--c-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── tabs ────────────────────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    align-items: center;
+    padding: 0 var(--mid-4) 1px;
+    border-bottom: 1px solid var(--c-line);
+    background: #fff;
+    overflow-x: auto;              /* 좁은 폭에서 가로 스크롤 */
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs .tab {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--mid-16) 12px;   /* 좌우 12px — 토큰 없음 → px */
+    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+    text-align: center;
+    white-space: nowrap;
+  }
+  .tabs .tab:not(.is-active) { opacity: 0.4; }
+
+  /* ── content ─────────────────────────────────────────────────── */
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 var(--px-16) var(--mid-40);
+    background: #fff;
+  }
+
+  .greeting-area {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-8);
+    width: 100%;
+    padding: var(--mid-32) 0;
+  }
+  .greeting-area .line {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    font-size: var(--fs-p1);       /* 18px @390 — 가변 */
+    line-height: 1.5;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  .greeting-area .desc {
+    width: 100%;
+    font-size: var(--fs-p3);       /* 14px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-sub);
+  }
+
+  /* ── section ─────────────────────────────────────────────────── */
+  .section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    padding: var(--mid-32) 0;
+  }
+  .section-head {
+    display: flex;
+    align-items: center;
+    gap: var(--mid-24);
+    width: 100%;
+    padding-bottom: var(--mid-16);
+    border-bottom: 1px solid var(--c-line);
+  }
+  .section-head .t {
+    flex: 1 0 0;
+    min-width: 0;
+    font-weight: 500;
+    font-size: var(--fs-p3);       /* 14px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+  }
+  .link-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 1px 0 2px;            /* 토큰 없음 → px */
+    border-bottom: 1px solid var(--c-text);
+    font-weight: 500;
+    font-size: var(--fs-btn-l);    /* 13px @390 — 가변 */
+    line-height: 1.2;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  /* ★ 검증 대상 — 섹션 content 의 min-height */
+  .section-body {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    min-height: var(--section-min-h);
+    padding-top: var(--mid-24);
+  }
+  .section-body.orders  { gap: var(--mid-12); }
+  .section-body.profile { gap: var(--mid-24); }
+  .section-body .empty {
+    width: 100%;
+    font-size: var(--fs-p3);       /* 14px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-muted);
+  }
+
+  /* ── recentOrderHistoryItem ──────────────────────────────────── */
+  .order {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--mid-16);
+    width: 100%;
+  }
+  .order .thumb { flex-shrink: 0; position: relative; width: 80px; height: 80px; overflow: hidden; }
+  .order .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .order .body {
+    display: flex;
+    flex: 1 0 0;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-end;
+    gap: var(--mid-8);
+  }
+  .order .text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--mid-6);
+    width: 100%;
+  }
+  .order .date {
+    font-size: var(--fs-c2);       /* 12px @390 — 가변 */
+    line-height: 1.2;
+    color: var(--c-sub);
+    white-space: nowrap;
+  }
+  .order .name {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--mid-4);
+    width: 100%;
+    font-weight: 500;
+    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+  .order .name > * { overflow: hidden; text-overflow: ellipsis; }
+  .order .price {
+    display: flex;
+    align-items: baseline;
+    font-weight: 500;
+    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+    white-space: nowrap;
+  }
+
+  /* ── profileInfo ─────────────────────────────────────────────── */
+  .info-block { display: flex; flex-direction: column; align-items: flex-start; gap: var(--mid-12); width: 100%; }
+  .info-block .label {
+    width: 100%;
+    font-size: var(--fs-p4);       /* 13px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-sub);
+  }
+  .info-block .values { display: flex; flex-direction: column; gap: var(--mid-8); width: 100%; }
+  .info-block .values p {
+    width: 100%;
+    font-size: var(--fs-p3);       /* 14px @390 — 가변 */
+    line-height: 1.6;
+    color: var(--c-text);
+  }
+  .info-block .row { display: flex; align-items: center; gap: var(--mid-8); width: 100%; }
+  .info-block .row span { font-size: var(--fs-p3); line-height: 1.6; white-space: nowrap; }
+  .divider { flex-shrink: 0; width: 1px; height: 12px; background: var(--c-line); }
+
+  /* ── 데모 컨트롤 — 시안에 없는 요소. 삭제해도 무방 ───────────── */
+  .demo-nav {
+    position: fixed;
+    left: 50%;
+    bottom: 12px;
+    z-index: 500;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 5px 8px;
+    align-items: center;
+    padding: 8px 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.14);
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .demo-nav strong { font-size: 10px; letter-spacing: 0.04em; color: #999; text-transform: uppercase; }
+  .demo-seg { display: flex; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 3px; overflow: hidden; }
+  .demo-seg button { padding: 4px 8px; color: #777; background: #fff; }
+  .demo-seg button + button { border-left: 1px solid rgba(0, 0, 0, 0.1); }
+  .demo-seg button.is-on { background: #111; color: #fff; font-weight: 600; }
+  .demo-readout {
+    grid-column: 1 / -1;
+    padding-top: 2px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    margin-top: 2px;
+    color: #999;
+    font-variant-numeric: tabular-nums;
+  }
+  .demo-readout b { color: #111; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="util menu" href="#">Menu</a>
+  <div class="logo">BRAND</div>
+  <a class="util bag" href="#">Bag [0]</a>
+</header>
+
+<div class="title-area">
+  <h1>마이페이지</h1>
+</div>
+
+<nav class="tabs">
+  <button type="button" class="tab is-active">홈</button>
+  <button type="button" class="tab">주문내역</button>
+  <button type="button" class="tab">위시리스트</button>
+  <button type="button" class="tab">쿠폰</button>
+  <button type="button" class="tab">리뷰</button>
+  <button type="button" class="tab">프로필</button>
+</nav>
+
+<main class="content">
+
+  <div class="greeting-area">
+    <p class="line"><span>홍길동</span><span>님, 안녕하세요</span></p>
+    <p class="desc">마이페이지에서 나의 쇼핑 정보를 확인해보세요</p>
+  </div>
+
+  <section class="section">
+    <div class="section-head">
+      <p class="t">최근 주문내역</p>
+      <button type="button" class="link-btn">전체보기</button>
+    </div>
+    <div class="section-body orders" id="orderBody"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <p class="t">프로필</p>
+      <button type="button" class="link-btn">프로필 관리</button>
+    </div>
+    <div class="section-body profile">
+      <div class="info-block">
+        <p class="label">내 정보</p>
+        <div class="values">
+          <p>홍길동</p>
+          <p>010-1234-1234</p>
+        </div>
+      </div>
+      <div class="info-block">
+        <p class="label">배송지</p>
+        <div class="values">
+          <p>[00000] 서울 마포구 양화로 147 아일렉스빌딩 413호</p>
+          <div class="row">
+            <span>홍길동</span>
+            <span class="divider"></span>
+            <span>010-1234-1234</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- 데모 컨트롤 — 시안에 없는 요소 -->
+<nav class="demo-nav" id="demoNav">
+  <strong>orders</strong>
+  <div class="demo-seg" id="orderToggle">
+    <button type="button" data-orders="0">0</button>
+    <button type="button" data-orders="1">1</button>
+    <button type="button" data-orders="2">2</button>
+    <button type="button" data-orders="3">3</button>
+  </div>
+
+  <strong>min-h</strong>
+  <div class="demo-seg" id="minhToggle">
+    <button type="button" data-minh="mid100">mid-100</button>
+    <button type="button" data-minh="fixed100">100px</button>
+    <button type="button" data-minh="off">off</button>
+  </div>
+
+  <p class="demo-readout" id="readout">–</p>
+</nav>
+
+<script>
+(() => {
+  const $  = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const ORDERS_KEY = 'fw-b-mypage-m-orders';
+  const MINH_KEY   = 'fw-b-mypage-m-minh';
+  const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
+  const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
+
+  /* 시안의 주문 3건 */
+  const ORDERS = [
+    { img: 'assets/order-1.png', date: '2025. 12. 31.', name: '포겟 미 낫 핸드 앤 바디 워시', more: 1, price: '208,000' },
+    { img: 'assets/order-2.png', date: '2025. 11. 21.', name: '베르가못 너리싱 비건 립밤',   more: 1, price: '120,000' },
+    { img: 'assets/order-3.png', date: '2025. 11. 21.', name: '핸드 앤 립 케어 듀오 세트',   more: 0, price: '40,000'  },
+  ];
+
+  function renderOrders(n) {
+    const body = $('#orderBody');
+    if (n === 0) {
+      body.innerHTML = '<p class="empty">최근 주문내역이 없습니다</p>';
+    } else {
+      body.innerHTML = ORDERS.slice(0, n).map(o => `
+        <div class="order">
+          <div class="thumb"><img src="${o.img}" alt=""></div>
+          <div class="body">
+            <div class="text">
+              <p class="date">${o.date}</p>
+              <p class="name"><span>${o.name}</span>${o.more ? `<span>외</span><span>${o.more}건</span>` : ''}</p>
+            </div>
+            <p class="price"><span>${o.price}</span><span>원</span></p>
+          </div>
+        </div>`).join('');
+    }
+  }
+
+  function setOrders(n) {
+    document.body.dataset.orders = n;
+    $$('#orderToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.orders === String(n)));
+    store(ORDERS_KEY, String(n));
+    renderOrders(n);
+    readout();
+  }
+
+  function setMinH(mode) {
+    document.body.dataset.minh = mode;
+    $$('#minhToggle button').forEach(b => b.classList.toggle('is-on', b.dataset.minh === mode));
+    store(MINH_KEY, mode);
+    readout();
+  }
+
+  function readout() {
+    const body = $('#orderBody');
+    const minH = parseFloat(getComputedStyle(body).minHeight) || 0;
+    /* min-height 를 잠시 해제해 실제 콘텐츠 높이를 잰다 */
+    const prev = body.style.minHeight;
+    body.style.minHeight = '0px';
+    const natural = body.getBoundingClientRect().height;
+    body.style.minHeight = prev;
+    const applied = body.getBoundingClientRect().height;
+    const binding = minH > natural + 0.5;
+    $('#readout').innerHTML =
+      `min-h <b>${minH.toFixed(1)}px</b> · 콘텐츠 <b>${natural.toFixed(1)}px</b> · ` +
+      `실제 <b>${applied.toFixed(1)}px</b> → ${binding ? '<b>min 적용</b>' : '콘텐츠가 더 큼'}` +
+      `<br>viewport ${innerWidth}px`;
+  }
+
+  $('#orderToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-orders]');
+    if (b) setOrders(Number(b.dataset.orders));
+  });
+  $('#minhToggle').addEventListener('click', e => {
+    const b = e.target.closest('[data-minh]');
+    if (b) setMinH(b.dataset.minh);
+  });
+  window.addEventListener('resize', readout);
+
+  window.__matrix = () => {
+    const body = $('#orderBody');
+    const out = { vw: innerWidth };
+    ['mid100','fixed100'].forEach(m => {
+      $(`[data-minh="${m}"]`).click();
+      const minH = parseFloat(getComputedStyle(body).minHeight) || 0;
+      const rows = {};
+      [0,1,2,3].forEach(n => {
+        $(`[data-orders="${n}"]`).click();
+        const prev = body.style.minHeight;
+        body.style.minHeight = '0px';
+        const nat = body.getBoundingClientRect().height;
+        body.style.minHeight = prev;
+        const app = body.getBoundingClientRect().height;
+        rows[n] = `${nat.toFixed(1)} → ${app.toFixed(1)}${minH > nat + 0.5 ? ' (min)' : ''}`;
+      });
+      out[m] = { minH: +minH.toFixed(2), rows };
+    });
+    $('[data-minh="mid100"]').click();
+    $('[data-orders="1"]').click();
+    return out;
+  };
+
+  setOrders(Number(load(ORDERS_KEY, '1')));
+  setMinH(load(MINH_KEY, 'mid100'));
+})();
+</script>
+
+</body>
+</html>
