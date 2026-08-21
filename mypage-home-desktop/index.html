@@ -24,9 +24,9 @@
      5) Font — 영문 Work Sans / 국문 Pretendard (--font 스택의 폴백으로 자동 분기)
 
      ※ 이 화면의 확인 목적
-       섹션 content 의 min-height 를 mid-100 으로 뒀을 때 뷰포트별로 적절한지.
-       우하단 패널에서 주문 건수(0~3)와 min-height 안(mid-100 / 120px 시안값 / off)을
-       바꿔가며 비교할 수 있고, 읽기값에 계산값·실제 높이·적용 여부가 표시된다.
+       섹션 content 의 min-height 를 mid-120 으로 뒀을 때 뷰포트별로 적절한지.
+       우하단 패널에서 주문 건수(0~3)와 min-height 안(mid-120 / mid-100 / 120px 시안값 /
+       off)을 바꿔가며 비교할 수 있고, 읽기값에 계산값·실제 높이·적용 여부가 표시된다.
      ───────────────────────────────────────────────────────────── */
   :root {
     /* 기준 단위 -------------------------------------------------- */
@@ -53,12 +53,13 @@
     --mid-72:  calc( 64 * var(--us) + 8px);
     --mid-80:  calc( 72 * var(--us) + 8px);
     --mid-100: calc( 92 * var(--us) + 8px);
+    --mid-120: calc(112 * var(--us) + 8px);
     --mid-160: calc(152 * var(--us) + 8px);
     /* px-* : 뷰포트와 무관하게 px 고정 */
     --px-12:   12px;
 
     /* 검증 대상 — 섹션 content 의 min-height */
-    --section-min-h: var(--mid-100);
+    --section-min-h: var(--mid-120);
 
     /* Grid — 12컬럼 / 거터 16px / 좌우 19px (모두 px) --------------- */
     --grid-gutter: 16px;
@@ -74,6 +75,7 @@
   }
 
   /* min-height 안 전환 (데모) */
+  body[data-minh="mid100"]   { --section-min-h: var(--mid-100); }
   body[data-minh="fixed120"] { --section-min-h: 120px; }   /* 시안 현재값 */
   body[data-minh="off"]      { --section-min-h: 0px; }
 
@@ -464,6 +466,7 @@
 
   <strong>min-h</strong>
   <div class="demo-seg" id="minhToggle">
+    <button type="button" data-minh="mid120">mid-120</button>
     <button type="button" data-minh="mid100">mid-100</button>
     <button type="button" data-minh="fixed120">120px</button>
     <button type="button" data-minh="off">off</button>
@@ -477,7 +480,7 @@
   const $  = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const ORDERS_KEY = 'fw-b-mypage-orders';
-  const MINH_KEY   = 'fw-b-mypage-minh';
+  const MINH_KEY   = 'fw-b-mypage-minh-v2';   /* 기본값 mid-120 로 변경 */
   const store = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const load  = (k, d) => { try { return localStorage.getItem(k) || d; } catch (e) { return d; } };
 
@@ -550,7 +553,7 @@
   window.addEventListener('resize', readout);
 
   setOrders(Number(load(ORDERS_KEY, '1')));
-  setMinH(load(MINH_KEY, 'mid100'));
+  setMinH(load(MINH_KEY, 'mid120'));
 })();
 </script>
 
